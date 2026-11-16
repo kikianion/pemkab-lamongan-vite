@@ -25,7 +25,7 @@ export default function LifeCycle({ cur, setCur }) {
             <span className="ic"><Icon name={s.icon} /></span>
             <span className="lb"><span><Lines lines={s.label} /></span></span>
             <span className="tr" />
-            <span className="chip">Swipe</span>
+            <span className="chip">&#x2B24;</span>
           </button>
         ))}
       </div>

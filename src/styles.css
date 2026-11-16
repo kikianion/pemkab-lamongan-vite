@@ -6,6 +6,7 @@
 /* ============================================================
    RESET & TOKENS
    ============================================================ */
+/* Tokens: color palette + default font for the whole app */
 :root {
    --navy: #0d1740;
    --teal: #2d6f66;
@@ -19,20 +20,24 @@
    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
 }
 
+/* Reset: universal box-sizing and zero margin */
 * {
    box-sizing: border-box;
    margin: 0
 }
 
+/* Page background behind the app shell */
 html {
    background: #070c24
 }
 
+/* Body: default text color, remove mobile tap highlight */
 body {
    color: var(--ink);
    -webkit-tap-highlight-color: transparent
 }
 
+/* Buttons: strip native styling, inherit font/color */
 button {
    font: inherit;
    color: inherit;
@@ -41,6 +46,7 @@ button {
    cursor: pointer
 }
 
+/* Keyboard focus ring for accessibility */
 :focus-visible {
    outline: 2px solid #9cc0ff;
    outline-offset: 2px
@@ -49,9 +55,10 @@ button {
 /* ============================================================
    APP SHELL
    ============================================================ */
+/* App shell: centered mobile-width container with gradient bg + bottom padding for tab bar */
 .app {
    position: relative;
-   max-width: 430px;
+   xmax-width: 430px;
    margin: 0 auto;
    min-height: 100dvh;
    overflow-x: hidden;
@@ -62,6 +69,7 @@ button {
 /* ============================================================
    HEADER / TOP
    ============================================================ */
+/* Header: gradient panel at top of page (search + brand) */
 .top {
    padding: calc(32px + env(safe-area-inset-top)) 13px 20px;
    height: auto;
@@ -72,6 +80,7 @@ button {
    box-shadow: 0 10px 30px #0a1650aa
 }
 
+/* Header: glowing gradient underline at bottom edge of .top */
 .top::after {
    content: "";
    position: absolute;
@@ -83,6 +92,7 @@ button {
    background: linear-gradient(90deg, #16286e 0%, #3f6fe0 30%, #7fb0ff 50%, #3f6fe0 70%, #16286e 100%)
 }
 
+/* Search bar: light rounded input row */
 .search {
    display: flex;
    align-items: center;
@@ -95,6 +105,7 @@ button {
    box-shadow: 0 2px 6px #0003
 }
 
+/* Search bar: text input */
 .search input {
    flex: 1;
    min-width: 0;
@@ -106,10 +117,12 @@ button {
    outline: 0
 }
 
+/* Search bar: placeholder text color */
 .search input::placeholder {
    color: #6f7599
 }
 
+/* Search bar: submit button */
 .search button {
    height: 29px;
    padding: 0 13px;
@@ -120,6 +133,7 @@ button {
    font-size: 14px
 }
 
+/* Brand row: title on left, avatar on right */
 .brand {
    display: flex;
    align-items: center;
@@ -127,12 +141,14 @@ button {
    margin-top: 20px
 }
 
+/* Brand row: app title heading */
 .brand h1 {
    font: 700 21px/1 Inter, sans-serif;
    letter-spacing: .2px;
    text-align: center
 }
 
+/* Brand row: circular user avatar image */
 .avatar {
    width: 71px;
    height: 71px;
@@ -146,6 +162,7 @@ button {
 /* ============================================================
    MAP
    ============================================================ */
+/* Map: container for the map image and pins */
 .map {
    position: relative;
    margin-top: -1px;
@@ -153,6 +170,7 @@ button {
    background: #0a1236
 }
 
+/* Map: the map image (fades out at bottom via mask) */
 .map>img {
    display: block;
    width: 100%;
@@ -162,24 +180,28 @@ button {
    mask-image: linear-gradient(#000 82%, transparent)
 }
 
+/* Map: floating locate-me round button */
 .locate {
    position: absolute;
+   display: none;
    right: 5.5%;
    top: 4.5%;
    width: 43px;
    height: 43px;
    border-radius: 50%;
-   display: grid;
+   xdisplay: grid;
    place-items: center;
    background: #0d1536cc;
    border: 1px solid #5b6489;
    backdrop-filter: blur(4px)
 }
 
+/* Map: locate button icon press feedback */
 .locate:active svg {
    transform: scale(.85)
 }
 
+/* Map: pin marker (icon + label), positioned by inline left/top */
 .pin {
    position: absolute;
    transform: translate(-50%, -17%);
@@ -190,6 +212,7 @@ button {
    transition: opacity .2s, transform .2s
 }
 
+/* Map: pin icon circle (default teal tone) */
 .pin i {
    width: 36px;
    height: 36px;
@@ -202,23 +225,27 @@ button {
    box-shadow: 0 0 14px #2fb59a55
 }
 
+/* Map: pin icon - purple tone variant */
 .pin[data-tone=purple] i {
    background: radial-gradient(#8a5fd6, #5f36a6);
    border-color: #a98af0;
    box-shadow: 0 0 14px #8a5fd688
 }
 
+/* Map: pin icon - blue tone variant */
 .pin[data-tone=blue] i {
    background: radial-gradient(#4a8cd6, #2c5a9f);
    border-color: #7db3f0;
    box-shadow: 0 0 14px #4a8cd688
 }
 
+/* Map: pin glyph size */
 .pin svg {
    width: 19px;
    height: 19px
 }
 
+/* Map: pin text label under the icon */
 .pin span {
    font: 600 11.5px/1.2 Inter, sans-serif;
    text-align: center;
@@ -226,15 +253,18 @@ button {
    white-space: nowrap
 }
 
+/* Map: pin dimmed/hidden state (filtered out) */
 .pin.hide {
    opacity: .15;
    pointer-events: none
 }
 
+/* Map: pin highlight pulse when matched by search */
 .pin.hit i {
    animation: pulse 1.2s ease-out 2
 }
 
+/* Map: pulse ring animation used by .pin.hit */
 @keyframes pulse {
    0% {
       box-shadow: 0 0 0 0 #fff9
@@ -248,24 +278,43 @@ button {
 /* ============================================================
    LIFE CYCLE
    ============================================================ */
+/* Life Cycle: section wrapper (overlaps map bottom) */
 .life {
    position: relative;
    margin-top: -34px;
-   padding: 0 13px
+   padding: 0 13px;
+   border: 1px solid red;
+   height: 250px;
 }
 
+/* Life Cycle: section title */
 .life h2 {
    font: 700 15px/1 Inter, sans-serif;
    margin-bottom: 27px;
    letter-spacing: .2px
 }
 
+/* Life Cycle: horizontal row of stage buttons */
 .rail {
    display: flex;
    align-items: flex-start;
-   margin: 0 -4px
+   margin: 0 -4px;
+   position: relative
 }
 
+/* Life Cycle: continuous connector line behind all stage dots */
+.rail::before {
+   content: "";
+   position: absolute;
+   left: 10%;
+   right: 10%;
+   top: 121px;
+   height: 1.5px;
+   background: #46508a;
+   pointer-events: none
+}
+
+/* Life Cycle: a single stage button (icon + label + track) */
 .item {
    flex: 1;
    display: flex;
@@ -276,6 +325,7 @@ button {
    min-width: 0
 }
 
+/* Life Cycle: stage icon circle (default state) */
 .item .ic {
    width: 58px;
    height: 58px;
@@ -288,11 +338,13 @@ button {
    transition: .25s
 }
 
+/* Life Cycle: stage icon glyph size */
 .item .ic svg {
    width: 27px;
    height: 27px
 }
 
+/* Life Cycle: stage text label (fixed height for alignment) */
 .item .lb {
    margin-top: 15px;
    font: 500 13.5px/1.15 Inter, sans-serif;
@@ -303,6 +355,7 @@ button {
    justify-content: center
 }
 
+/* Life Cycle: progress track under the label (holds the dot) */
 .item .tr {
    position: relative;
    width: 100%;
@@ -310,6 +363,7 @@ button {
    margin-top: 6px
 }
 
+/* Life Cycle: per-item connector segment (now transparent; line drawn by .rail::before) */
 .item .tr::before {
    content: "";
    position: absolute;
@@ -317,9 +371,10 @@ button {
    right: 0;
    top: 4px;
    height: 1.5px;
-   background: #46508a
+   background: transparent
 }
 
+/* Life Cycle: progress dot on the track */
 .item .tr::after {
    content: "";
    position: absolute;
@@ -332,18 +387,22 @@ button {
    background: #6b6aa8
 }
 
+/* Life Cycle: completed-stage connector color (teal) */
 .item.done .tr::before {
-   background: #6fb7c4
+   xbackground: #6fb7c4
 }
 
+/* Life Cycle: completed-stage dot color (teal) */
 .item.done .tr::after {
    background: #7fd0d0
 }
 
+/* Life Cycle: 'Swipe' chip (hidden unless active) */
 .item .chip {
    display: none
 }
 
+/* Life Cycle: active stage button (purple lifted card) */
 .item.on {
    flex: 1.18;
    background: linear-gradient(#3a2b86, #1d2257 60%, #1b2152);
@@ -357,6 +416,7 @@ button {
 
 }
 
+/* Life Cycle: active stage icon circle (purple) */
 .item.on .ic {
    width: 60px;
    height: 60px;
@@ -365,6 +425,7 @@ button {
    box-shadow: 0 0 16px #8a5fd699
 }
 
+/* Life Cycle: active stage label (bold, larger) */
 .item.on .lb {
    font-weight: 700;
    font-size: 15px;
@@ -376,10 +437,12 @@ button {
    justify-content: center
 }
 
+/* Life Cycle: hide the dot on the active stage (line still passes through) */
 .item.on .tr {
-   display: none
+   visibility: hidden
 }
 
+/* Life Cycle: show the 'Swipe' chip on the active stage */
 .item.on .chip {
    display: block;
    margin-top: 9px;
@@ -390,22 +453,26 @@ button {
    font-size: 13px
 }
 
+/* Life Cycle: prev/next arrow buttons (shared) */
 .arrow {
    position: absolute;
-   bottom: 6px;
+   bottom: 40px;
    color: #9aa4d6
 }
 
+/* Life Cycle: left (previous) arrow */
 .arrow.l {
    left: 13px;
    opacity: .7
 }
 
+/* Life Cycle: right (next) arrow */
 .arrow.r {
    right: 13px;
    color: #fff
 }
 
+/* Life Cycle: dimmed arrow when disabled at range end */
 .arrow[disabled] {
    opacity: .25
 }
@@ -413,6 +480,7 @@ button {
 /* ============================================================
    SERVICE CARDS
    ============================================================ */
+/* Service Cards: two-column grid of service cards */
 .cards {
    display: grid;
    grid-template-columns: 1fr 1fr;
@@ -420,6 +488,7 @@ button {
    padding: 26px 13px 0
 }
 
+/* Service Cards: a single service card */
 .card {
    display: flex;
    align-items: flex-start;
@@ -432,6 +501,7 @@ button {
    border: 1px solid #2b3560
 }
 
+/* Service Cards: icon tile on the card */
 .card .tile {
    flex: none;
    width: 30px;
@@ -443,11 +513,13 @@ button {
    color: #cfe7e3
 }
 
+/* Service Cards: icon tile glyph size */
 .card .tile svg {
    width: 18px;
    height: 18px
 }
 
+/* Service Cards: card title text */
 .card b {
    font: 700 14px/1.2 Inter, sans-serif
 }
@@ -455,13 +527,14 @@ button {
 /* ============================================================
    TAB BAR
    ============================================================ */
+/* Tab Bar: fixed bottom navigation (mobile) */
 .tabs {
    position: fixed;
    left: 50%;
    bottom: 0;
    transform: translateX(-50%);
    width: 100%;
-   max-width: 430px;
+   xmax-width: 430px;
    height: calc(75px + env(safe-area-inset-bottom));
    padding-bottom: env(safe-area-inset-bottom);
    display: grid;
@@ -471,6 +544,7 @@ button {
    z-index: 5
 }
 
+/* Tab Bar: a single nav item (icon + label) */
 .tabs a {
    position: relative;
    display: flex;
@@ -483,14 +557,17 @@ button {
    text-decoration: none
 }
 
+/* Tab Bar: active nav item text color */
 .tabs a.on {
    color: #fff
 }
 
+/* Tab Bar: active nav item icon color */
 .tabs a.on svg {
    color: #6ba4ff
 }
 
+/* Tab Bar: top highlight bar over active nav item */
 .tabs a.on::before {
    content: "";
    position: absolute;
@@ -507,6 +584,7 @@ button {
 /* ============================================================
    ACCESSIBILITY
    ============================================================ */
+/* Accessibility: disable all animation/transition when user prefers reduced motion */
 @media (prefers-reduced-motion:reduce) {
    * {
       animation: none !important;
@@ -518,16 +596,19 @@ button {
    TABLET  >= 768px
    ============================================================ */
 @media (min-width:768px) {
+   /* Tablet: page background radial glow */
    html {
       background: #070c24 radial-gradient(120% 80% at 50% 0, #14226b 0, #070c24 70%) fixed;
       min-height: 100%
    }
 
    /* allow full-bleed header to escape .app; clip at body instead */
+   /* Tablet: clip horizontal overflow */
    body {
       overflow-x: hidden
    }
 
+   /* Tablet: app shell width + outer frame shadow */
    .app {
       max-width: 760px;
       padding-bottom: calc(112px + env(safe-area-inset-bottom));
@@ -536,6 +617,7 @@ button {
    }
 
    /* stretch header to full viewport width while keeping .app centred */
+   /* Tablet: full-bleed header */
    .top {
       padding: calc(36px + env(safe-area-inset-top)) 32px 28px;
       width: 100vw;
@@ -543,6 +625,7 @@ button {
       border-radius: 0
    }
 
+   /* Tablet: search bar size */
    .search {
       height: 50px;
       padding: 0 6px 0 18px;
@@ -550,15 +633,18 @@ button {
       gap: 12px
    }
 
+   /* Tablet: search icon size */
    .search svg {
       width: 26px;
       height: 26px
    }
 
+   /* Tablet: search input text size */
    .search input {
       font-size: 18px
    }
 
+   /* Tablet: search submit button size */
    .search button {
       height: 38px;
       padding: 0 20px;
@@ -566,74 +652,90 @@ button {
       border-radius: 12px
    }
 
+   /* Tablet: brand row spacing */
    .brand {
       margin-top: 26px
    }
 
+   /* Tablet: brand title size */
    .brand h1 {
       font-size: 30px;
       letter-spacing: .4px
    }
 
+   /* Tablet: avatar size */
    .avatar {
       width: 100px;
       height: 100px;
       border-width: 3px
    }
 
+   /* Tablet: locate button size */
    .locate {
       width: 56px;
       height: 56px
    }
 
+   /* Tablet: locate icon size */
    .locate svg {
       width: 42px;
       height: 42px
    }
 
+   /* Tablet: pin spacing */
    .pin {
       gap: 8px
    }
 
+   /* Tablet: pin icon size */
    .pin i {
       width: 50px;
       height: 50px;
       border-width: 2px
    }
 
+   /* Tablet: pin glyph size */
    .pin svg {
       width: 26px;
       height: 26px
    }
 
+   /* Tablet: pin label size */
    .pin span {
       font-size: 15px
    }
 
+   /* Tablet: life-cycle section padding */
    .life {
       margin-top: -20px;
-      padding: 0 32px
+      padding: 0 32px;
+      height: 335px;
    }
 
+   /* Tablet: life-cycle title size */
    .life h2 {
       font-size: 21px;
       margin-bottom: 36px
    }
 
+   /* Tablet: rail side bleed */
    .rail {
       margin: 0 -6px
    }
 
+   /* Tablet: stage icon size */
    .item .ic {
       width: 78px;
       height: 78px
    }
 
+   /* Tablet: stage icon glyph size */
    .item .ic svg {
       width: 36px;
       height: 36px
    }
 
+   /* Tablet: stage label size/spacing */
    .item .lb {
       margin-top: 18px;
       font-size: 17px;
@@ -643,6 +745,7 @@ button {
       justify-content: center
    }
 
+   /* Tablet: active stage card radius/padding */
    .item.on {
       border-radius: 44px;
       border-bottom-left-radius: 15px;
@@ -651,11 +754,13 @@ button {
       padding: 10px 0 16px
    }
 
+   /* Tablet: active stage icon size */
    .item.on .ic {
       width: 84px;
       height: 84px
    }
 
+   /* Tablet: active stage label size */
    .item.on .lb {
       font-size: 20px;
       height: 48px;
@@ -666,6 +771,7 @@ button {
       justify-content: center
    }
 
+   /* Tablet: active 'Swipe' chip size */
    .item.on .chip {
       margin-top: 12px;
       padding: 8px 22px;
@@ -673,43 +779,52 @@ button {
       border-radius: 18px
    }
 
+   /* Tablet: progress track size */
    .item .tr {
       height: 12px;
       margin-top: 8px
    }
 
+   /* Tablet: progress segment offset */
    .item .tr::before {
       top: 5px
    }
 
+   /* Tablet: progress dot size */
    .item .tr::after {
       width: 12px;
       height: 12px;
       margin-left: -6px
    }
 
+   /* Tablet: arrow vertical position */
    .arrow {
-      bottom: 10px
+      bottom: 60px
    }
 
+   /* Tablet: left arrow position */
    .arrow.l {
       left: 32px
    }
 
+   /* Tablet: right arrow position */
    .arrow.r {
       right: 32px
    }
 
+   /* Tablet: arrow icon size */
    .arrow svg {
       width: 34px;
       height: 34px
    }
 
+   /* Tablet: service cards grid spacing */
    .cards {
       gap: 16px;
       padding: 36px 32px 0
    }
 
+   /* Tablet: service card size/padding */
    .card {
       min-height: 128px;
       padding: 18px;
@@ -717,36 +832,43 @@ button {
       border-radius: 18px
    }
 
+   /* Tablet: service card tile size */
    .card .tile {
       width: 44px;
       height: 44px;
       border-radius: 12px
    }
 
+   /* Tablet: service card tile glyph size */
    .card .tile svg {
       width: 26px;
       height: 26px
    }
 
+   /* Tablet: service card title size */
    .card b {
       font-size: 19px
    }
 
+   /* Tablet: tab bar height/width */
    .tabs {
       max-width: 760px;
       height: calc(88px + env(safe-area-inset-bottom))
    }
 
+   /* Tablet: tab item text size/spacing */
    .tabs a {
       font-size: 16px;
       gap: 7px
    }
 
+   /* Tablet: tab icon size */
    .tabs a svg {
       width: 34px;
       height: 34px
    }
 
+   /* Tablet: active tab highlight bar size */
    .tabs a.on::before {
       width: 88px;
       margin-left: -44px;
@@ -758,6 +880,7 @@ button {
    DESKTOP  >= 1100px
    ============================================================ */
 @media (min-width:1100px) {
+   /* Desktop: grid layout - header top, map left, life/cards right */
    .app {
       max-width: 1280px;
       min-height: 100dvh;
@@ -770,6 +893,7 @@ button {
       padding-bottom: 140px;
    }
 
+   /* Desktop: header spans full width, 3-column grid */
    .top {
       grid-area: top;
       display: grid;
@@ -781,6 +905,7 @@ button {
       margin-left: calc(50% - 50vw)
    }
 
+   /* Desktop: search bar in header left column */
    .search {
       grid-column: 1;
       width: 100%;
@@ -788,6 +913,7 @@ button {
       height: 52px
    }
 
+   /* Desktop: brand centered in header */
    .brand {
       grid-column: 2;
       margin-top: 0;
@@ -795,16 +921,19 @@ button {
       justify-content: center
    }
 
+   /* Desktop: brand title sizing */
    .brand h1 {
       font-size: 30px;
       white-space: nowrap
    }
 
+   /* Desktop: avatar size */
    .avatar {
       width: 76px;
       height: 76px
    }
 
+   /* Desktop: map fills left column full height */
    .map {
       grid-area: map;
       margin: 0;
@@ -814,59 +943,72 @@ button {
       position: relative
    }
 
+   /* Desktop: map image fades out on right edge */
    .map>img {
       -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
       mask-image: linear-gradient(90deg, #000 88%, transparent)
    }
 
+   /* Desktop: pin icon size */
    .pin i {
       width: 56px;
       height: 56px
    }
 
+   /* Desktop: pin glyph size */
    .pin svg {
       width: 29px;
       height: 29px
    }
 
+   /* Desktop: pin label size */
    .pin span {
       font-size: 16px
    }
 
+   /* Desktop: pins are clickable */
    .pin {
       cursor: pointer
    }
 
+   /* Desktop: locate button size */
    .locate {
       width: 60px;
       height: 60px
    }
 
+   /* Desktop: life-cycle section in right column top */
    .life {
       grid-area: life;
       margin: 0;
       padding: 40px 40px 0 28px;
-      align-self: start
+      align-self: start;
+      height: 350px;
    }
 
+   /* Desktop: life-cycle title size */
    .life h2 {
       font-size: 22px
    }
 
+   /* Desktop: rail side bleed */
    .rail {
       margin: 0 -4px
    }
 
+   /* Desktop: stage icon size */
    .item .ic {
       width: 64px;
       height: 64px
    }
 
+   /* Desktop: stage icon glyph size */
    .item .ic svg {
       width: 30px;
       height: 30px
    }
 
+   /* Desktop: stage label size */
    .item .lb {
       font-size: 14.5px;
       height: 42px;
@@ -875,11 +1017,13 @@ button {
       justify-content: center
    }
 
+   /* Desktop: active stage icon size */
    .item.on .ic {
       width: 70px;
       height: 70px
    }
 
+   /* Desktop: active stage label size */
    .item.on .lb {
       font-size: 16.5px;
       height: 42px;
@@ -889,23 +1033,29 @@ button {
       justify-content: center
    }
 
+   /* Desktop: active 'Swipe' chip size */
    .item.on .chip {
       padding: 7px 16px;
       font-size: 14px
    }
 
+   /* Desktop: arrows sit below the rail */
    .arrow {
-      bottom: -48px
+      xbottom: -48px;
+      bottom: 58px;
    }
 
+   /* Desktop: left arrow position */
    .arrow.l {
       left: 28px
    }
 
+   /* Desktop: right arrow position */
    .arrow.r {
       right: 40px
    }
 
+   /* Desktop: service cards in right column bottom (single column) */
    .cards {
       grid-area: cards;
       grid-template-columns: 1fr;
@@ -914,14 +1064,17 @@ button {
       align-content: start
    }
 
+   /* Desktop: service card height */
    .card {
       min-height: 112px
    }
 
+   /* Desktop: service card title size */
    .card b {
       font-size: 20px
    }
 
+   /* Desktop: floating rounded dock tab bar */
    .tabs {
       left: 50%;
       bottom: 22px;
@@ -936,11 +1089,13 @@ button {
       background: linear-gradient(#1f2f4ccc, #1a2748ee)
    }
 
+   /* Desktop: dock tab item radius + transition */
    .tabs a {
       border-radius: 22px;
       transition: background .2s, color .2s
    }
 
+   /* Desktop: active tab highlight at top of dock */
    .tabs a.on::before {
       top: 0
    }
@@ -950,31 +1105,106 @@ button {
    HOVER  (pointer devices only)
    ============================================================ */
 @media (hover:hover) and (min-width:768px) {
+   /* Hover: service card transition setup */
    .card {
       transition: transform .2s, border-color .2s, box-shadow .2s
    }
 
+   /* Hover: service card lifts + highlights */
    .card:hover {
       transform: translateY(-2px);
       border-color: #4a5aa8;
       box-shadow: 0 10px 26px #0006
    }
 
+   /* Hover: inactive stage icon tint on hover */
    .item:not(.on):hover .ic {
       border-color: #6fb7c4;
       background: radial-gradient(#3a8079, #245b5a)
    }
 
+   /* Hover: map pin lifts slightly */
    .pin:hover {
       transform: translate(-50%, -20%)
    }
 
+   /* Hover: tab item highlights */
    .tabs a:hover {
       color: #fff;
       background: #ffffff0d
    }
 
+   /* Hover: search submit button brightens */
    .search button:hover {
       filter: brightness(1.12)
    }
+}
+
+/* ============================================================
+   DEBUG: COMPONENT TAGS  (only when .app has class "debug")
+   Each tag is an out-of-flow ::before label pinned to the
+   top-left of its element, so it never affects layout.
+   Toggle: add class "debug" to <main className="app">.
+   ============================================================ */
+.app.debug .top,
+.app.debug .search,
+.app.debug .brand,
+.app.debug .map,
+.app.debug .locate,
+.app.debug .life,
+.app.debug .cards,
+.app.debug .card,
+.app.debug .tabs {
+   xposition: relative
+}
+
+.app.debug .top::before,
+.app.debug .search::before,
+.app.debug .brand::before,
+.app.debug .map::before,
+.app.debug .locate::before,
+.app.debug .life::before,
+.app.debug .cards::before,
+.app.debug .card::before,
+.app.debug .tabs::before {
+   position: absolute;
+   top: 0;
+   left: 0;
+   transform: translateY(-100%);
+   z-index: 9999;
+   pointer-events: none;
+   padding: 1px 5px;
+   font: 600 10px/1.4 ui-monospace, monospace;
+   color: #bff;
+   background: #000c;
+   border: 1px solid #0ff6;
+   border-radius: 3px;
+   white-space: nowrap
+}
+
+/* Debug: which component/selector each tag names */
+.app.debug .top::before    { content: "Header  .top" }
+.app.debug .search::before { content: "Header / Search  .search" }
+.app.debug .brand::before  { content: "Header / Brand  .brand" }
+.app.debug .map::before    { content: "MapSection  .map" }
+.app.debug .locate::before { content: "Map / Locate  .locate" }
+.app.debug .life::before   { content: "LifeCycle  .life" }
+.app.debug .cards::before  { content: "ServiceCards  .cards" }
+.app.debug .card::before   { content: "ServiceCards / Card  .card" }
+.app.debug .tabs::before   { content: "TabBar  .tabs" }
+
+/* Debug: live viewport width readout, fixed bottom-left, extra-small */
+.app.debug .debug-width {
+   position: fixed;
+   left: 6px;
+   bottom: 6px;
+   z-index: 99999;
+   pointer-events: none;
+   padding: 1px 5px;
+   font: 600 10px/1.4 ui-monospace, monospace;
+   color: #bff;
+   background: #000c;
+   border: 1px solid #0ff6;
+   border-radius: 3px;
+   white-space: nowrap
 }

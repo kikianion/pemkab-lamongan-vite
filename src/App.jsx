@@ -3,6 +3,7 @@ import Sprite from './components/Sprite'
 import Header from './components/Header'
 import MapSection from './components/MapSection'
 import LifeCycle from './components/LifeCycle'
+import DebugWidth from './components/DebugWidth'
 import ServiceCards from './components/ServiceCards'
 import TabBar from './components/TabBar'
 
@@ -15,7 +16,7 @@ export default function App() {
   const [tab, setTab] = useState('Beranda')
 
   return (
-    <main className="app">
+    <main className="app debug">
       <Sprite />
       <Header onSearch={setQuery} />
       <MapSection
@@ -26,6 +27,7 @@ export default function App() {
       <LifeCycle cur={stage} setCur={setStage} />
       <ServiceCards stage={stage} />
       <TabBar active={tab} onChange={setTab} />
+      <DebugWidth />
     </main>
   )
 }
