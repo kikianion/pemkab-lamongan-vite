@@ -159,6 +159,11 @@ button {
    background: #26439f
 }
 
+/* Side portraits: hidden by default (mobile/tablet); revealed on desktop */
+.side-portrait {
+   display: none
+}
+
 /* ============================================================
    MAP
    ============================================================ */
@@ -886,18 +891,18 @@ button {
       min-height: 100dvh;
       overflow-x: visible;
       display: grid;
-      grid-template-columns: minmax(0, 1.55fr) minmax(380px, 1fr);
+      grid-template-columns: 150px minmax(0, 1.55fr) minmax(380px, 1fr) 150px;
       grid-template-rows: auto auto 1fr;
-      grid-template-areas: "top top" "map life" "map cards";
+      grid-template-areas: "top top top top" "bupati map life wakil" "bupati map cards wakil";
       align-content: start;
       padding-bottom: 140px;
    }
 
-   /* Desktop: header spans full width, 3-column grid */
+   /* Desktop: header full width; title left, search right, avatars hidden */
    .top {
       grid-area: top;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: auto 1fr;
       align-items: center;
       padding: calc(28px + env(safe-area-inset-top)) 40px 28px;
       border-radius: 0;
@@ -905,20 +910,21 @@ button {
       margin-left: calc(50% - 50vw)
    }
 
-   /* Desktop: search bar in header left column */
+   /* Desktop: search bar on the right of the header */
    .search {
-      grid-column: 1;
+      grid-column: 2;
+      justify-self: end;
       width: 100%;
       max-width: 320px;
       height: 52px
    }
 
-   /* Desktop: brand centered in header */
+   /* Desktop: brand title on the left of the header */
    .brand {
-      grid-column: 2;
+      grid-column: 1;
       margin-top: 0;
       gap: 24px;
-      justify-content: center
+      justify-content: flex-start
    }
 
    /* Desktop: brand title sizing */
@@ -931,6 +937,35 @@ button {
    .avatar {
       width: 76px;
       height: 76px
+   }
+
+   /* Desktop: hide header avatars (side columns take their place) */
+   .brand .avatar {
+      display: none
+   }
+
+   /* Desktop: reveal side portraits (bupati left, wakil right) */
+   .side-portrait {
+      display: block;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+      border: 2.5px solid #2f7f82;
+      box-shadow: 0 4px 12px #0006;
+      background: #26439f;
+      margin: 24px auto 0
+   }
+   .side-portrait.left {
+      grid-area: bupati;
+      justify-self: center;
+      align-self: start
+   }
+   .side-portrait.right {
+      grid-area: wakil;
+      justify-self: center;
+      align-self: start
    }
 
    /* Desktop: map fills left column full height */

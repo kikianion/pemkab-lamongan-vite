@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import Sprite from './components/Sprite'
+import portraitLeft from './assets/portrait-left.jpg'
+import portraitRight from './assets/portrait-right.jpg'
 import Header from './components/Header'
 import MapSection from './components/MapSection'
 import LifeCycle from './components/LifeCycle'
@@ -18,6 +20,7 @@ export default function App() {
   return (
     <main className="app debug">
       <Sprite />
+      <img className="side-portrait left" src={portraitLeft} alt="Bupati Lamongan" />
       <Header onSearch={setQuery} />
       <MapSection
         query={query}
@@ -27,6 +30,7 @@ export default function App() {
       <LifeCycle cur={stage} setCur={setStage} />
       <ServiceCards stage={stage} />
       <TabBar active={tab} onChange={setTab} />
+      <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
       <DebugWidth />
     </main>
   )
