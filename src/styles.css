@@ -903,6 +903,7 @@ button {
       grid-area: top;
       display: grid;
       grid-template-columns: auto 1fr;
+      grid-template-rows: 1fr;
       align-items: center;
       padding: calc(28px + env(safe-area-inset-top)) 40px 28px;
       border-radius: 0;
@@ -913,6 +914,7 @@ button {
    /* Desktop: search bar on the right of the header */
    .search {
       grid-column: 2;
+      grid-row: 1;
       justify-self: end;
       width: 100%;
       max-width: 320px;
@@ -922,6 +924,7 @@ button {
    /* Desktop: brand title on the left of the header */
    .brand {
       grid-column: 1;
+      grid-row: 1;
       margin-top: 0;
       gap: 24px;
       justify-content: flex-start
