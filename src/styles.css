@@ -69,11 +69,12 @@ button {
 /* ============================================================
    HEADER / TOP
    ============================================================ */
-/* Header: gradient panel at top of page (search + brand) */
+/* Header: gradient panel at top of page (search + brand) - sticky on mobile */
 .top {
    padding: calc(32px + env(safe-area-inset-top)) 13px 20px;
    height: auto;
-   position: relative;
+   position: sticky;
+   top: 0;
    z-index: 2;
    background: linear-gradient(#26439f, #1d3585 45%, #16275b);
    border-radius: 0 0 4px 4px;
@@ -901,6 +902,7 @@ button {
    /* Desktop: header full width; title left, search right, avatars hidden */
    .top {
       grid-area: top;
+      position: relative;
       display: grid;
       grid-template-columns: auto 1fr;
       grid-template-rows: 1fr;
