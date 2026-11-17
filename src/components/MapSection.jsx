@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import map from '../assets/map_island_cropped.svg'
 import Icon, { Lines } from './Icon'
 import { PINS } from '../data'
@@ -27,6 +27,17 @@ export default function MapSection({ query, hit, onPin }) {
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
 
+  const [isDesktop, setIsDesktop] = useState(false)
+  const drag = useRef(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width:768px)')
+    const sync = () => setIsDesktop(mq.matches)
+    sync()
+    mq.addEventListener?.('change', sync)
+    return () => mq.removeEventListener?.('change', sync)
+  }, [])
+
   const clamp = (s) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, s))
   const zoomBy = (d) => setScale((s) => {
     const ns = clamp(s + d)
@@ -41,16 +52,37 @@ export default function MapSection({ query, hit, onPin }) {
   }))
   const panDisabled = scale <= 1
 
+  const canDrag = isDesktop && scale > 1
+  const onPointerDown = (e) => {
+    if (!canDrag) return
+    // Let control buttons (zoom/joystick) handle their own clicks
+    if (e.target.closest('.map-zoom, .map-joystick')) return
+    drag.current = { x: e.clientX - offset.x, y: e.clientY - offset.y }
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+  }
+  const onPointerMove = (e) => {
+    if (!drag.current) return
+    setOffset({
+      x: Math.round(e.clientX - drag.current.x),
+      y: Math.round(e.clientY - drag.current.y),
+    })
+  }
+  const onPointerUp = () => { drag.current = null }
+
   return (
     <section
-      className="map"
+      className={`map${canDrag ? ' draggable' : ''}`}
       aria-label="Peta layanan"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerUp}
     >
       <div
         className="map-canvas"
-        style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})` }}
+        style={{ transform: `scale(${scale}) translate(${offset.x}px, ${offset.y}px)` }}
       >
-        <img src={map} alt="Peta Kabupaten Lamongan" />
+        <img src={map} alt="Peta Kabupaten Lamongan" draggable={false} />
         {PINS.map((p) => {
           const hidden = q && !p.name.toLowerCase().includes(q)
           return (
@@ -58,7 +90,7 @@ export default function MapSection({ query, hit, onPin }) {
               key={`${p.id}-${hit.id === p.id ? hit.tick : 0}`}
               className={`pin${hidden ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
               data-tone={p.tone}
-              style={{ left: `${p.left}%`, top: `${p.top}%` }}
+              style={{ left: `${p.left}%`, top: `${p.top}%`, '--pin-scale': 1 / scale }}
               onClick={() => onPin(p.id)}
             >
               <i><Icon name={p.icon} /></i>
@@ -67,6 +99,9 @@ export default function MapSection({ query, hit, onPin }) {
           )
         })}
       </div>
+      <div className="map-fade" aria-hidden="true" />
+      <div className="map-fade-corner map-fade-corner-l" aria-hidden="true" />
+      <div className="map-fade-corner map-fade-corner-r" aria-hidden="true" />
       <div className="map-joystick" aria-label="Geser peta">
         <JoystickButton area="up" label="Geser atas" disabled={panDisabled} onClick={() => panBy(0, PAN_STEP)}>&#9650;</JoystickButton>
         <JoystickButton area="left" label="Geser kiri" disabled={panDisabled} onClick={() => panBy(PAN_STEP, 0)}>&#9664;</JoystickButton>

@@ -203,7 +203,31 @@ button {
    inset: 0;
    transform-origin: center center;
    will-change: transform;
+   touch-action: auto
+}
+.map.draggable {
+   cursor: grab;
    touch-action: none
+}
+
+/* Map: fixed bottom fade pinned to container (mobile/tablet only) */
+.map-fade {
+   position: absolute;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   height: 18%;
+   z-index: 3;
+   pointer-events: none;
+   background: linear-gradient(to bottom, transparent, #070c24 90%)
+}
+
+/* Map: desktop-only corner fades (bottom-left & bottom-right) */
+.map-fade-corner {
+   display: none
+}
+.map.draggable:active {
+   cursor: grabbing
 }
 
 /* Map: the map image (fits fully inside box; fades out at bottom via mask) */
@@ -211,9 +235,9 @@ button {
    display: block;
    width: 100%;
    height: 100%;
-   object-fit: contain;
-   -webkit-mask-image: linear-gradient(#000 82%, transparent);
-   mask-image: linear-gradient(#000 82%, transparent)
+   object-fit: fill;
+   user-select: none;
+   -webkit-user-drag: none
 }
 
 /* Map: zoom/pan control group (bottom-right on mobile/tablet) */
@@ -245,6 +269,8 @@ button {
    left: 10px;
    bottom: 40px;
    z-index: 4;
+   transform: scale(1.2);
+   transform-origin: bottom left;
    display: grid;
    grid-template-columns: 26px 26px 26px;
    grid-template-rows: 26px 26px 26px;
@@ -313,12 +339,14 @@ button {
 /* Map: pin marker (icon + label), positioned by inline left/top */
 .pin {
    position: absolute;
-   transform: translate(-50%, -17%);
+   transform: translate(-50%, -17%) scale(var(--pin-scale, 1));
+   transform-origin: 50% 17%;
    display: flex;
    flex-direction: column;
    align-items: center;
    gap: 6px;
-   transition: opacity .2s, transform .2s
+   transition: opacity .2s;
+   will-change: transform
 }
 
 /* Map: pin icon circle (default teal tone) */
@@ -390,7 +418,9 @@ button {
 /* Life Cycle: section wrapper (overlaps map bottom) */
 .life {
    position: relative;
-   margin-top: -34px;
+   z-index: 5;
+   pointer-events: none;
+   margin-top: -14px;
    padding: 0 13px;
    xborder: 1px solid red;
    height: 250px;
@@ -398,6 +428,7 @@ button {
 
 /* Life Cycle: section title */
 .life h2 {
+   pointer-events: auto;
    font: 700 15px/1 Inter, sans-serif;
    margin-bottom: 27px;
    letter-spacing: .2px
@@ -408,7 +439,8 @@ button {
    display: flex;
    align-items: flex-start;
    margin: 0 -4px;
-   position: relative
+   position: relative;
+   pointer-events: auto
 }
 
 /* Life Cycle: continuous connector line behind all stage dots */
@@ -431,7 +463,8 @@ button {
    align-items: center;
    position: relative;
    padding-top: 0;
-   min-width: 0
+   min-width: 0;
+   pointer-events: auto
 }
 
 /* Life Cycle: stage icon circle (default state) */
@@ -566,7 +599,8 @@ button {
 .arrow {
    position: absolute;
    bottom: 40px;
-   color: #9aa4d6
+   color: #9aa4d6;
+   pointer-events: auto
 }
 
 /* Life Cycle: left (previous) arrow */
@@ -724,6 +758,28 @@ button {
       text-shadow: 0 0 3px #000, 0 2px 4px #000e, 0 0 1px #000
    }
 
+   /* Desktop: replace full-width bottom fade with bottom-corner fades */
+   .map-fade {
+      display: none
+   }
+   .map-fade-corner {
+      display: block;
+      position: absolute;
+      bottom: 0;
+      width: 34%;
+      height: 26%;
+      z-index: 3;
+      pointer-events: none
+   }
+   .map-fade-corner-l {
+      left: 0;
+      background: radial-gradient(120% 120% at 0 100%, #070c24 0, transparent 70%)
+   }
+   .map-fade-corner-r {
+      right: 0;
+      background: radial-gradient(120% 120% at 100% 100%, #070c24 0, transparent 70%)
+   }
+
    /* Tablet: page background radial glow */
    html {
       background: #070c24 radial-gradient(120% 80% at 50% 0, #14226b 0, #070c24 70%) fixed;
@@ -835,7 +891,7 @@ button {
 
    /* Tablet: life-cycle section padding */
    .life {
-      margin-top: -20px;
+      margin-top: -25px;
       padding: 0 32px;
       height: 335px;
    }
@@ -849,6 +905,10 @@ button {
    /* Tablet: rail side bleed */
    .rail {
       margin: 0 -6px
+   }
+   /* Tablet: align connector line to larger dots */
+   .rail::before {
+      top: 159px
    }
 
    /* Tablet: stage icon size */
@@ -1167,6 +1227,10 @@ button {
    .rail {
       margin: 0 -4px
    }
+   /* Desktop: align connector line to dots */
+   .rail::before {
+      top: 137px
+   }
 
    /* Desktop: stage icon size */
    .item .ic {
@@ -1317,9 +1381,9 @@ button {
       background: radial-gradient(#3a8079, #245b5a)
    }
 
-   /* Hover: map pin lifts slightly */
+   /* Hover: map pin lifts slightly (keep counter-scale for constant size) */
    .pin:hover {
-      transform: translate(-50%, -20%)
+      transform: translate(-50%, -20%) scale(var(--pin-scale, 1))
    }
 
    /* Hover: tab item highlights */
