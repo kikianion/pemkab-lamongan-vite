@@ -69,12 +69,11 @@ button {
 /* ============================================================
    HEADER / TOP
    ============================================================ */
-/* Header: gradient panel at top of page (search + brand) - sticky on mobile */
+/* Header: gradient panel at top of page (search + brand) - search scrolls, brand sticks */
 .top {
    padding: calc(32px + env(safe-area-inset-top)) 13px 20px;
    height: auto;
-   position: sticky;
-   top: 0;
+   position: relative;
    z-index: 2;
    background: linear-gradient(#26439f, #1d3585 45%, #16275b);
    border-radius: 0 0 4px 4px;
@@ -134,12 +133,18 @@ button {
    font-size: 14px
 }
 
-/* Brand row: title on left, avatar on right */
+/* Brand row: title + avatars; sticks below top while search scrolls away */
 .brand {
    display: flex;
    align-items: center;
    justify-content: space-between;
-   margin-top: 20px
+   margin-top: 20px;
+   position: sticky;
+   top: 0;
+   z-index: 3;
+   background: linear-gradient(#26439f, #1d3585 45%, #16275b);
+   padding: 6px 0;
+   border-radius: 0 0 4px 4px
 }
 
 /* Brand row: app title heading */
@@ -923,10 +928,13 @@ button {
       height: 52px
    }
 
-   /* Desktop: brand title on the left of the header */
+   /* Desktop: brand title on the left of the header (reset mobile sticky) */
    .brand {
       grid-column: 1;
       grid-row: 1;
+      position: static;
+      background: none;
+      padding: 0;
       margin-top: 0;
       gap: 24px;
       justify-content: flex-start
