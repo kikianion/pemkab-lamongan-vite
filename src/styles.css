@@ -288,7 +288,7 @@ button {
    position: relative;
    margin-top: -34px;
    padding: 0 13px;
-   border: 1px solid red;
+   xborder: 1px solid red;
    height: 250px;
 }
 
@@ -887,7 +887,7 @@ button {
 @media (min-width:1100px) {
    /* Desktop: grid layout - header top, map left, life/cards right */
    .app {
-      max-width: 1280px;
+      max-width: 1600px;
       min-height: 100dvh;
       overflow-x: visible;
       display: grid;
@@ -947,28 +947,28 @@ button {
       display: none
    }
 
-   /* Desktop: reveal side portraits (bupati left, wakil right) */
+   /* Desktop: reveal side portraits (bupati left, wakil right), 2x size, vertically centered */
    .side-portrait {
       display: block;
-      width: 76px;
-      height: 76px;
+      width: 152px;
+      height: 152px;
       border-radius: 50%;
       object-fit: cover;
       object-position: center top;
       border: 2.5px solid #2f7f82;
       box-shadow: 0 4px 12px #0006;
       background: #26439f;
-      margin: 24px auto 0
+      margin: 0 auto
    }
    .side-portrait.left {
       grid-area: bupati;
       justify-self: center;
-      align-self: start
+      align-self: center
    }
    .side-portrait.right {
       grid-area: wakil;
       justify-self: center;
-      align-self: start
+      align-self: center
    }
 
    /* Desktop: map fills left column full height */
@@ -1098,13 +1098,13 @@ button {
       grid-area: cards;
       grid-template-columns: 1fr;
       gap: 14px;
-      padding: 84px 40px 0 28px;
+      padding: 10px 40px 0 28px;
       align-content: start
    }
 
-   /* Desktop: service card height */
+   /* Desktop: service card height (0.5x of 112px) */
    .card {
-      min-height: 112px
+      min-height: 56px
    }
 
    /* Desktop: service card title size */
@@ -1243,6 +1243,51 @@ button {
    color: #bff;
    background: #000c;
    border: 1px solid #0ff6;
+   border-radius: 3px;
+   white-space: nowrap
+}
+
+/* Debug (ServiceCards): dedicated self-contained label.
+   Sets its own position:relative so it works even though the
+   shared anchor rule above is disabled (xposition). */
+.app.debug .cards {
+   position: relative
+}
+.app.debug .cards::before {
+   content: "ServiceCards  .cards";
+   position: absolute;
+   top: 0;
+   left: 0;
+   transform: translateY(-100%);
+   z-index: 9999;
+   pointer-events: none;
+   padding: 1px 5px;
+   font: 600 10px/1.4 ui-monospace, monospace;
+   color: #bff;
+   background: #000c;
+   border: 1px solid #0ff6;
+   border-radius: 3px;
+   white-space: nowrap
+}
+
+/* Debug (ServiceCards > Card): dedicated self-contained label for
+   each .card, anchored to that card's own top-left. */
+.app.debug .cards .card {
+   position: relative
+}
+.app.debug .cards .card::before {
+   content: "ServiceCards / Card  .card";
+   position: absolute;
+   top: 0;
+   left: 0;
+   transform: translateY(-100%);
+   z-index: 9999;
+   pointer-events: none;
+   padding: 1px 5px;
+   font: 600 10px/1.4 ui-monospace, monospace;
+   color: #fcb;
+   background: #000c;
+   border: 1px solid #fa06;
    border-radius: 3px;
    white-space: nowrap
 }
