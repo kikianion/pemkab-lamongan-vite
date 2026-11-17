@@ -133,30 +133,12 @@ button {
    font-size: 14px
 }
 
-/* Brand row: title + avatars (plain flex; sticky handled by .brandbar) */
+/* Brand row: title on left, avatar on right */
 .brand {
    display: flex;
    align-items: center;
    justify-content: space-between;
    margin-top: 20px
-}
-
-/* Brand bar: page-level sticky bar for mobile/tablet (search scrolls away) */
-.brandbar {
-   position: sticky;
-   top: 0;
-   z-index: 3;
-   background: linear-gradient(#26439f, #1d3585 45%, #16275b);
-   padding: 8px 13px;
-   box-shadow: 0 10px 30px #0a1650aa
-}
-
-/* Only the mobile/tablet brand shows in the sticky bar */
-.brand--desktop {
-   display: none
-}
-.brandbar .brand {
-   margin-top: 0
 }
 
 /* Brand row: app title heading */
@@ -947,17 +929,6 @@ button {
       margin-top: 0;
       gap: 24px;
       justify-content: flex-start
-   }
-
-   /* Desktop: use the in-header brand, hide the mobile sticky bar */
-   .brandbar {
-      display: none
-   }
-   .brand--mobile {
-      display: none
-   }
-   .brand--desktop {
-      display: flex
    }
 
    /* Desktop: brand title sizing */
