@@ -924,12 +924,12 @@ button {
       padding-bottom: 140px;
    }
 
-   /* Desktop: header full width; title left, search right, avatars hidden */
+   /* Desktop: header full width; title left, tabs center, search right */
    .top {
       grid-area: top;
       position: relative;
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto auto 1fr;
       grid-template-rows: 1fr;
       align-items: center;
       padding: calc(28px + env(safe-area-inset-top)) 40px 28px;
@@ -940,7 +940,7 @@ button {
 
    /* Desktop: search bar on the right of the header */
    .search {
-      grid-column: 2;
+      grid-column: 3;
       grid-row: 1;
       justify-self: end;
       width: 100%;
@@ -1144,11 +1144,13 @@ button {
       display: none
    }
 
-   /* Desktop: show the header tab bar as a seamless row in the top bar */
+   /* Desktop: header tab bar centered between title and search */
    .tabs--header {
       display: block;
-      grid-column: 1 / -1;
-      margin-top: 18px
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: center;
+      margin-top: 0
    }
    .tabs--header .tabs {
       position: static;
