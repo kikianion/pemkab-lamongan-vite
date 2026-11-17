@@ -201,7 +201,7 @@ button {
 .map-canvas {
    position: absolute;
    inset: 0;
-   transform-origin: 0 0;
+   transform-origin: center center;
    will-change: transform;
    touch-action: none
 }
@@ -237,6 +237,60 @@ button {
    background: #0d1536cc;
    border: 1px solid #5b6489;
    backdrop-filter: blur(4px)
+}
+
+/* Map: joystick pan control (bottom-left) - replaces drag panning */
+.map-joystick {
+   position: absolute;
+   left: 10px;
+   bottom: 40px;
+   z-index: 4;
+   display: grid;
+   grid-template-columns: 26px 26px 26px;
+   grid-template-rows: 26px 26px 26px;
+   gap: 0;
+   grid-template-areas:
+      ". up ."
+      "left reset right"
+      ". down ."
+}
+.map-joystick button {
+   width: 26px;
+   height: 26px;
+   border-radius: 0;
+   display: grid;
+   place-items: center;
+   font: 800 18px/1 Inter, sans-serif;
+   color: #dfe6ff;
+   background: none;
+   border: none;
+   -webkit-tap-highlight-color: transparent;
+   text-shadow: 0 0 3px #000, 0 2px 4px #000e, 0 0 1px #000
+}
+.map-joystick button:disabled {
+   opacity: .35
+}
+.map-joystick button:not(:disabled):active {
+   color: #fff;
+   transform: scale(.85)
+}
+.js-up { grid-area: up }
+.js-down { grid-area: down }
+.js-left { grid-area: left }
+.js-right { grid-area: right }
+
+/* Optical centering: filled triangles sit slightly low/high in their line-box */
+.js-up   { transform: translateY(1px) }
+.js-down { transform: translateY(-1px) }
+
+.map-joystick button:not(:disabled):active.js-up   { transform: translateY(1px) scale(.85) }
+.map-joystick button:not(:disabled):active.js-down { transform: translateY(-1px) scale(.85) }
+.js-reset { grid-area: reset; display: none }
+
+/* Map: locate-me button hidden (kept in DOM, not displayed) */
+.locate[hidden],
+.locate.is-hidden {
+   display: none !important
 }
 
 /* Map: locate-me round button (inside the zoom group) */
@@ -656,6 +710,20 @@ button {
    TABLET  >= 768px
    ============================================================ */
 @media (min-width:768px) {
+   /* Tablet/desktop: keep compact joystick + bold shadow */
+   .map-joystick {
+      grid-template-columns: 26px 26px 26px;
+      grid-template-rows: 26px 26px 26px;
+      gap: 0
+   }
+   .map-joystick button {
+      width: 26px;
+      height: 26px;
+      border-radius: 0;
+      font: 800 18px/1 Inter, sans-serif;
+      text-shadow: 0 0 3px #000, 0 2px 4px #000e, 0 0 1px #000
+   }
+
    /* Tablet: page background radial glow */
    html {
       background: #070c24 radial-gradient(120% 80% at 50% 0, #14226b 0, #070c24 70%) fixed;
