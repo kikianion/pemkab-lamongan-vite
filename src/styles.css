@@ -924,12 +924,12 @@ button {
       padding-bottom: 140px;
    }
 
-   /* Desktop: header full width; title left, tabs center, search right */
+   /* Desktop: header full width; title left, tabs centered, search right */
    .top {
       grid-area: top;
       position: relative;
       display: grid;
-      grid-template-columns: auto auto 1fr;
+      grid-template-columns: 1fr auto 1fr;
       grid-template-rows: 1fr;
       align-items: center;
       padding: calc(28px + env(safe-area-inset-top)) 40px 28px;
