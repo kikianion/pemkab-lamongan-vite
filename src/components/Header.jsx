@@ -6,18 +6,22 @@ export default function Header({ onSearch }) {
   const [q, setQ] = useState('')
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
-  const expandedH = useRef(0)
+  const initialMapTop = useRef(0)
 
   useEffect(() => {
+    const mapEl = () => document.querySelector('.map')
+
     const measure = () => {
-      // measure expanded height only (ignore collapsed state)
-      if (topRef.current) expandedH.current = topRef.current.offsetHeight
+      const m = mapEl()
+      if (m) initialMapTop.current = m.getBoundingClientRect().top + window.scrollY
     }
     const onScroll = () => {
       // only collapse below the desktop breakpoint
       if (window.innerWidth >= 1100) { setCollapsed(false); return }
-      // setCollapsed(window.scrollY > expandedH.current / 3)
-      // setCollapsed(window.scrollY > 20)
+      const m = mapEl()
+      if (!m) return
+      const mapViewportTop = m.getBoundingClientRect().top
+      setCollapsed(mapViewportTop <= initialMapTop.current / 2)
     }
     const onResize = () => { measure(); onScroll() }
     measure()

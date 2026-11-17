@@ -1,4 +1,4 @@
-import map from '../assets/map_yellow_roads.svg'
+import map from '../assets/map_island_only.svg'
 import Icon, { Lines } from './Icon'
 import { PINS } from '../data'
 

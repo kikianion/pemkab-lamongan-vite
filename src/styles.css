@@ -193,7 +193,7 @@ button {
    position: relative;
    margin-top: -1px;
    aspect-ratio: 1165/950;
-   background: #0a1236
+   xbackground: #0a1236
 }
 
 /* Map: the map image (fades out at bottom via mask) */
@@ -912,7 +912,7 @@ button {
       min-height: 100dvh;
       overflow-x: visible;
       display: grid;
-      grid-template-columns: 150px minmax(0, 1.55fr) minmax(380px, 1fr) 150px;
+      grid-template-columns: 250px minmax(0, 1.0fr) minmax(380px, 1.2fr) 250px;
       grid-template-rows: auto auto 1fr;
       grid-template-areas: "top top top top" "bupati map life wakil" "bupati map cards wakil";
       align-content: start;
