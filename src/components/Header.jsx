@@ -1,12 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
 
 export default function Header({ onSearch }) {
   const [q, setQ] = useState('')
+  const [collapsed, setCollapsed] = useState(false)
+  const topRef = useRef(null)
+  const expandedH = useRef(0)
+
+  useEffect(() => {
+    const measure = () => {
+      // measure expanded height only (ignore collapsed state)
+      if (topRef.current) expandedH.current = topRef.current.offsetHeight
+    }
+    const onScroll = () => {
+      // only collapse below the desktop breakpoint
+      if (window.innerWidth >= 1100) { setCollapsed(false); return }
+      setCollapsed(window.scrollY > expandedH.current / 2)
+    }
+    const onResize = () => { measure(); onScroll() }
+    measure()
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
   return (
-    <header className="top">
-      <form className="search" role="search" onSubmit={(e) => { e.preventDefault(); onSearch(q.trim()) }}>
+    <header className="top" ref={topRef}>
+      <form className={`search${collapsed ? ' collapsed' : ''}`} role="search" onSubmit={(e) => { e.preventDefault(); onSearch(q.trim()) }}>
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
         </svg>

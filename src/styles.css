@@ -69,11 +69,12 @@ button {
 /* ============================================================
    HEADER / TOP
    ============================================================ */
-/* Header: gradient panel at top of page (search + brand) - search scrolls, brand sticks */
+/* Header: gradient panel at top of page (search + brand) - sticky on mobile/tablet */
 .top {
    padding: calc(32px + env(safe-area-inset-top)) 13px 20px;
    height: auto;
-   position: relative;
+   position: sticky;
+   top: 0;
    z-index: 2;
    background: linear-gradient(#26439f, #1d3585 45%, #16275b);
    border-radius: 0 0 4px 4px;
@@ -102,7 +103,20 @@ button {
    border-radius: 12px;
    background: #d1d5ee;
    color: #667;
-   box-shadow: 0 2px 6px #0003
+   box-shadow: 0 2px 6px #0003;
+   overflow: hidden;
+   transition: height .3s ease, opacity .3s ease, margin .3s ease, padding .3s ease
+}
+
+/* Search bar: collapsed state (scrolled past half the topbar height) */
+.search.collapsed {
+   height: 0;
+   opacity: 0;
+   margin: 0;
+   padding-top: 0;
+   padding-bottom: 0;
+   border: 0;
+   box-shadow: none
 }
 
 /* Search bar: text input */
