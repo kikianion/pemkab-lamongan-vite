@@ -61,7 +61,7 @@ button {
    xmax-width: 430px;
    margin: 0 auto;
    min-height: 100dvh;
-   overflow-x: hidden;
+   overflow-x: clip;
    padding-bottom: calc(84px + env(safe-area-inset-bottom));
    background: linear-gradient(#0f1b52 0, #0b1440 60%, #0a1236)
 }
@@ -78,7 +78,14 @@ button {
    z-index: 2;
    background: linear-gradient(#26439f, #1d3585 45%, #16275b);
    border-radius: 0 0 4px 4px;
-   box-shadow: 0 10px 30px #0a1650aa
+   box-shadow: 0 10px 30px #0a1650aa;
+   transition: padding .3s ease
+}
+
+/* Header: tighten padding when the search is collapsed (mobile/tablet) */
+.top:has(.search.collapsed) {
+   padding-top: calc(0px + env(safe-area-inset-top));
+   padding-bottom: 10px
 }
 
 /* Header: glowing gradient underline at bottom edge of .top */
@@ -622,9 +629,9 @@ button {
    }
 
    /* allow full-bleed header to escape .app; clip at body instead */
-   /* Tablet: clip horizontal overflow */
+   /* Tablet: clip horizontal overflow (clip keeps sticky working) */
    body {
-      overflow-x: hidden
+      overflow-x: clip
    }
 
    /* Tablet: app shell width + outer frame shadow */

@@ -16,7 +16,8 @@ export default function Header({ onSearch }) {
     const onScroll = () => {
       // only collapse below the desktop breakpoint
       if (window.innerWidth >= 1100) { setCollapsed(false); return }
-      setCollapsed(window.scrollY > expandedH.current / 2)
+      // setCollapsed(window.scrollY > expandedH.current / 3)
+      // setCollapsed(window.scrollY > 20)
     }
     const onResize = () => { measure(); onScroll() }
     measure()
