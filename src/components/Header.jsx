@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
+import TabBar from './TabBar'
 
-export default function Header({ onSearch }) {
+export default function Header({ onSearch, active, onChange }) {
   const [q, setQ] = useState('')
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
@@ -47,6 +48,9 @@ export default function Header({ onSearch }) {
         <img className="avatar" src={left} alt="Bupati Lamongan" />
         <h1>PEMKAB LAMONGAN</h1>
         <img className="avatar" src={right} alt="Wakil Bupati Lamongan" />
+      </div>
+      <div className="tabs--header">
+        <TabBar active={active} onChange={onChange} />
       </div>
     </header>
   )

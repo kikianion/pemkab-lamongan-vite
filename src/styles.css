@@ -607,6 +607,11 @@ button {
    box-shadow: 0 0 8px #4cb4ff
 }
 
+/* Tab Bar (header copy): hidden on mobile/tablet, shown on desktop */
+.tabs--header {
+   display: none
+}
+
 /* ============================================================
    ACCESSIBILITY
    ============================================================ */
@@ -1134,30 +1139,50 @@ button {
       font-size: 20px
    }
 
-   /* Desktop: floating rounded dock tab bar */
-   .tabs {
-      left: 50%;
-      bottom: 22px;
-      width: min(560px, calc(100% - 48px));
-      max-width: none;
-      height: 76px;
-      padding-bottom: 0;
-      border: 1px solid #2c3d63;
-      border-radius: 22px;
-      box-shadow: 0 14px 40px #000a;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(#1f2f4ccc, #1a2748ee)
+   /* Desktop: hide the bottom tab bar (header tab bar takes over) */
+   .app > .tabs {
+      display: none
    }
 
-   /* Desktop: dock tab item radius + transition */
-   .tabs a {
-      border-radius: 22px;
+   /* Desktop: show the header tab bar as a seamless row in the top bar */
+   .tabs--header {
+      display: block;
+      grid-column: 1 / -1;
+      margin-top: 18px
+   }
+   .tabs--header .tabs {
+      position: static;
+      transform: none;
+      left: auto;
+      bottom: auto;
+      width: 100%;
+      height: auto;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      background: none;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      z-index: auto
+   }
+   .tabs--header .tabs a {
+      flex-direction: row;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 999px;
       transition: background .2s, color .2s
    }
-
-   /* Desktop: active tab highlight at top of dock */
-   .tabs a.on::before {
-      top: 0
+   .tabs--header .tabs a svg {
+      width: 20px;
+      height: 20px
+   }
+   .tabs--header .tabs a.on {
+      background: #ffffff1a
+   }
+   .tabs--header .tabs a.on::before {
+      display: none
    }
 }
 

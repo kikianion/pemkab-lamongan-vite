@@ -21,7 +21,7 @@ export default function App() {
     <main className="app debug">
       <Sprite />
       <img className="side-portrait left" src={portraitLeft} alt="Bupati Lamongan" />
-      <Header onSearch={setQuery} />
+      <Header onSearch={setQuery} active={tab} onChange={setTab} />
       <MapSection
         query={query}
         hit={hit}
