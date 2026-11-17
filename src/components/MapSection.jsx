@@ -1,4 +1,4 @@
-import map from '../assets/map_island_only.svg'
+import map from '../assets/map_island_cropped.svg'
 import Icon, { Lines } from './Icon'
 import { PINS } from '../data'
 
