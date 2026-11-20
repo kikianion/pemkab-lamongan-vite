@@ -82,18 +82,35 @@ export default function MapSection({ query, hit, onPin }) {
   const canDrag = isDesktop && scale > 1
   const onPointerDown = (e) => {
     if (!canDrag) return
-    // Let control buttons (zoom/joystick) handle their own clicks
-    if (e.target.closest('.map-zoom, .map-joystick')) return
-    drag.current = { x: e.clientX - offset.x, y: e.clientY - offset.y }
-    e.currentTarget.setPointerCapture?.(e.pointerId)
+    // Never hijack clicks on buttons (pins, joystick, zoom)
+    if (e.target.closest('.pin, .map-zoom, .map-joystick')) return
+    drag.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initOffsetX: offset.x,
+      initOffsetY: offset.y,
+      moved: false,
+      pointerId: e.pointerId,
+      target: e.currentTarget,
+    }
   }
+
   const onPointerMove = (e) => {
     if (!drag.current) return
-    setOffset({
-      x: Math.round(e.clientX - drag.current.x),
-      y: Math.round(e.clientY - drag.current.y),
-    })
+    const dx = e.clientX - drag.current.startX
+    const dy = e.clientY - drag.current.startY
+    if (!drag.current.moved && Math.hypot(dx, dy) > 5) {
+      drag.current.moved = true
+      drag.current.target.setPointerCapture?.(drag.current.pointerId)
+    }
+    if (drag.current.moved) {
+      setOffset({
+        x: Math.round(drag.current.initOffsetX + dx),
+        y: Math.round(drag.current.initOffsetY + dy),
+      })
+    }
   }
+
   const onPointerUp = () => { drag.current = null }
 
   return (
@@ -118,7 +135,10 @@ export default function MapSection({ query, hit, onPin }) {
               className={`pin${hidden ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
               data-tone={p.tone}
               style={{ left: `${p.left}%`, top: `${p.top}%`, '--pin-scale': 1 / scale }}
-              onClick={() => onPin(p)}
+              onClick={(e) => {
+                e.stopPropagation()
+                onPin(p)
+              }}
             >
               <i><Icon name={p.icon} /></i>
               <span><Lines lines={p.label} /></span>
