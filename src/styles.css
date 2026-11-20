@@ -1380,10 +1380,10 @@ button {
       display: none;
    }
 
-   /* Ghost glide position in Map Mode (glides smoothly to top-left floating glassmorphism pill) */
+   /* Ghost glide position in Map Mode (glides smoothly to floating glassmorphism pill, offset to uncover map buttons) */
    .nav-morph-container.docked-map {
       top: 24px;
-      left: 28px;
+      left: 170px;
       transform: translateX(0);
       background: rgba(12, 38, 30, 0.92);
       backdrop-filter: blur(16px);
