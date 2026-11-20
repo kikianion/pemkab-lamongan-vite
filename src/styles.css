@@ -1637,6 +1637,13 @@ button {
    border-radius: 14px;
 }
 
+/* Hide search box completely in map mode */
+.app.map-mode .morphing-search {
+   opacity: 0;
+   pointer-events: none;
+   transform: translateY(-24px) scale(0.9);
+}
+
 /* Docked into Services Tabular Header */
 .morphing-search.docked-table {
    top: 140px;

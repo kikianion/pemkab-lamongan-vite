@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Icon from './Icon'
 import { fetchServices } from '../api'
 
-export default function ServicesTable({ query, onSelectService, onViewOnMap }) {
+export default function ServicesTable({ query, onSelectService }) {
   const [services, setServices] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedStage, setSelectedStage] = useState('all')
@@ -75,7 +75,6 @@ export default function ServicesTable({ query, onSelectService, onViewOnMap }) {
                   <th style={{ width: '60px' }}>Icon</th>
                   <th>Nama Layanan</th>
                   <th>Tahapan Siklus</th>
-                  <th>Lokasi di Peta</th>
                   <th style={{ textAlign: 'right' }}>Aksi</th>
                 </tr>
               </thead>
@@ -108,20 +107,6 @@ export default function ServicesTable({ query, onSelectService, onViewOnMap }) {
                             : item.stage.label
                           : `Tahap ${item.stage_id}`}
                       </span>
-                    </td>
-                    <td>
-                      {item.left_pct !== null && item.top_pct !== null ? (
-                        <button
-                          type="button"
-                          className="table-map-pin-btn"
-                          onClick={() => onViewOnMap && onViewOnMap(item)}
-                          title="Klik untuk tampilkan di peta"
-                        >
-                          📍 {item.left_pct}%, {item.top_pct}%
-                        </button>
-                      ) : (
-                        <span className="table-non-map">- Non-Peta -</span>
-                      )}
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <div className="table-action-group">
