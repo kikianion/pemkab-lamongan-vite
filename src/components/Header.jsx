@@ -2,28 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
 import frontLogo from '../assets/front-logo.gif'
+import frontLogoFinal from '../assets/front-logo-final.png'
 
 export default function Header({ children, navSlot }) {
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
   const initialMapTop = useRef(0)
-  const canvasRef = useRef(null)
-  const [freezeGif, setFreezeGif] = useState(false)
+  const [isFinished, setIsFinished] = useState(false)
 
   useEffect(() => {
-    // Front logo GIF: freeze on the final frame after playing once (5880ms)
+    // Front logo GIF plays for exactly 1 cycle (5880ms) on initial load, then stays on the final frame image
     const timer = setTimeout(() => {
-      const img = document.querySelector('.brand-logo-desktop')
-      const canvas = canvasRef.current
-      if (img && canvas) {
-        canvas.width = img.naturalWidth || img.clientWidth || 60
-        canvas.height = img.naturalHeight || img.clientHeight || 60
-        const ctx = canvas.getContext('2d')
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-          setFreezeGif(true)
-        }
-      }
+      setIsFinished(true)
     }, 5880)
 
     return () => clearTimeout(timer)
@@ -66,14 +56,8 @@ export default function Header({ children, navSlot }) {
         <div className="brand-logo-wrap">
           <img
             className="brand-logo-desktop"
-            src={frontLogo}
+            src={isFinished ? frontLogoFinal : frontLogo}
             alt="Logo Pemkab Lamongan"
-            style={{ display: freezeGif ? 'none' : 'block' }}
-          />
-          <canvas
-            ref={canvasRef}
-            className="brand-logo-desktop brand-logo-canvas"
-            style={{ display: freezeGif ? 'block' : 'none' }}
           />
         </div>
         <h1>PEMKAB LAMONGAN</h1>
