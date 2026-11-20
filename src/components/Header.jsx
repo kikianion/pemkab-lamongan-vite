@@ -2,22 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
 import frontLogo from '../assets/front-logo.gif'
-import frontLogoFinal from '../assets/front-logo-final.png'
 
 export default function Header({ children, navSlot }) {
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
   const initialMapTop = useRef(0)
-  const [isFinished, setIsFinished] = useState(false)
-
-  useEffect(() => {
-    // Front logo GIF plays for exactly 1 cycle (5880ms) on initial load, then stays on the final frame image
-    const timer = setTimeout(() => {
-      setIsFinished(true)
-    }, 5880)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   useEffect(() => {
     const mapEl = () => document.querySelector('.map')
@@ -56,7 +45,7 @@ export default function Header({ children, navSlot }) {
         <div className="brand-logo-wrap">
           <img
             className="brand-logo-desktop"
-            src={isFinished ? frontLogoFinal : frontLogo}
+            src={frontLogo}
             alt="Logo Pemkab Lamongan"
           />
         </div>

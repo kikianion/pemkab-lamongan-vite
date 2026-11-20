@@ -1192,8 +1192,8 @@ button {
 
    .brand-logo-desktop {
       position: absolute;
-      width: 72px;
-      height: 72px;
+      width: 92px;
+      height: 92px;
       max-width: none;
       object-fit: contain;
       filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
