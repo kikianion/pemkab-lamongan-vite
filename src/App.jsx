@@ -25,8 +25,10 @@ export default function App() {
     }
   }
 
+  const isMapMode = tab === 'Peta'
+
   return (
-    <main className="app debug">
+    <main className={`app debug${isMapMode ? ' map-mode' : ''}`}>
       <Sprite />
       <img className="side-portrait left" src={portraitLeft} alt="Bupati Lamongan" />
       <Header onSearch={setQuery} active={tab} onChange={setTab} />

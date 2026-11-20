@@ -1357,6 +1357,82 @@ button {
    .tabs--header .tabs a.on::before {
       display: none
    }
+
+   /* Desktop Map Mode: Map fills the entire left column (replaces bupati portrait area) */
+   .app.map-mode {
+      grid-template-columns: minmax(0, 1.8fr) minmax(380px, 1fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+         "map life"
+         "map cards";
+      padding-top: 0;
+   }
+
+   .app.map-mode .top,
+   .app.map-mode .side-portrait.left,
+   .app.map-mode .side-portrait.right {
+      display: none !important;
+   }
+
+   .app.map-mode .map {
+      grid-area: map;
+      height: 100vh;
+      min-height: 100vh;
+      position: sticky;
+      top: 0;
+      border-radius: 0;
+   }
+
+   .app.map-mode .map-canvas > img {
+      -webkit-mask-image: none;
+      mask-image: none;
+   }
+
+   /* Floating back/exit navigation on desktop map mode */
+   .app.map-mode > .tabs {
+      display: flex !important;
+      position: fixed;
+      top: 24px;
+      left: 28px;
+      bottom: auto;
+      transform: none;
+      z-index: 100;
+      background: rgba(12, 38, 30, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      border-radius: 999px;
+      padding: 6px 14px;
+      gap: 6px;
+      width: auto;
+      height: auto;
+   }
+
+   .app.map-mode > .tabs a {
+      flex-direction: row;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      border-radius: 999px;
+   }
+
+   .app.map-mode > .tabs a svg {
+      width: 18px;
+      height: 18px;
+   }
+}
+
+/* Map mode on mobile / tablet */
+@media (max-width: 1099px) {
+   .app.map-mode .top,
+   .app.map-mode .side-portrait {
+      display: none !important;
+   }
+
+   .app.map-mode .map {
+      min-height: calc(100vh - 120px);
+      height: auto;
+   }
 }
 
 /* ============================================================
