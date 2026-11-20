@@ -17,6 +17,14 @@ export default function App() {
   const [hit, setHit] = useState({ id: null, tick: 0 })
   const [tab, setTab] = useState('Beranda')
 
+  const handlePinClick = (pin) => {
+    setHit((h) => ({ id: pin.id, tick: h.tick + 1 }))
+    // If the service is associated with a specific stage, switch to that stage
+    if (typeof pin.stage_id === 'number') {
+      setStage(pin.stage_id - 1)
+    }
+  }
+
   return (
     <main className="app debug">
       <Sprite />
@@ -25,10 +33,10 @@ export default function App() {
       <MapSection
         query={query}
         hit={hit}
-        onPin={(id) => { setHit((h) => ({ id, tick: h.tick + 1 })); setStage(KTP_STAGE) }}
+        onPin={handlePinClick}
       />
       <LifeCycle cur={stage} setCur={setStage} />
-      <ServiceCards stage={stage} />
+      <ServiceCards stage={stage} activeServiceId={hit.id} />
       <TabBar active={tab} onChange={setTab} />
       <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
       <DebugWidth />
