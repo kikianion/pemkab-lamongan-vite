@@ -7,6 +7,7 @@ import MapSection from './components/MapSection'
 import LifeCycle from './components/LifeCycle'
 import DebugWidth from './components/DebugWidth'
 import ServiceCards from './components/ServiceCards'
+import ServicesTable from './components/ServicesTable'
 import TabBar from './components/TabBar'
 
 const KTP_STAGE = 2
@@ -19,26 +20,100 @@ export default function App() {
 
   const handlePinClick = (pin) => {
     setHit((h) => ({ id: pin.id, tick: h.tick + 1 }))
-    // If the service is associated with a specific stage, switch to that stage
     if (typeof pin.stage_id === 'number') {
       setStage(pin.stage_id - 1)
     }
   }
 
+  const handleViewOnMap = (service) => {
+    setTab('Peta')
+    handlePinClick(service)
+  }
+
   const isMapMode = tab === 'Peta'
+  const isLayananMode = tab === 'Layanan'
 
   return (
-    <main className={`app debug${isMapMode ? ' map-mode' : ''}`}>
+    <main
+      className={`app debug${isMapMode ? ' map-mode' : ''}${
+        isLayananMode ? ' layanan-mode' : ''
+      }`}
+    >
       <Sprite />
       <img className="side-portrait left" src={portraitLeft} alt="Bupati Lamongan" />
-      <Header onSearch={setQuery} active={tab} onChange={setTab} />
-      <MapSection
-        query={query}
-        hit={hit}
-        onPin={handlePinClick}
-      />
-      <LifeCycle cur={stage} setCur={setStage} />
-      <ServiceCards stage={stage} activeServiceId={hit.id} />
+
+      {/* Floating search form morphs between header and tabular header */}
+      <form
+        className={`search morphing-search ${isLayananMode ? 'docked-table' : 'docked-header'}`}
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault()
+        }}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="22"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4-4" />
+        </svg>
+        <input
+          type="search"
+          placeholder="Cari layanan publik..."
+          aria-label="Cari layanan"
+          autoComplete="off"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        {query && (
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#667',
+              cursor: 'pointer',
+              fontSize: '16px',
+              padding: '0 4px',
+            }}
+          >
+            ✕
+          </button>
+        )}
+      </form>
+
+      <Header active={tab} onChange={setTab}>
+        {/* Placeholder spacer in header grid */}
+        <div className="header-search-anchor" />
+      </Header>
+
+      {/* When in Layanan tab, show full Tabular view */}
+      {isLayananMode ? (
+        <ServicesTable
+          query={query}
+          onSelectService={(s) => {
+            if (s.stage_id) setStage(s.stage_id - 1)
+          }}
+          onViewOnMap={handleViewOnMap}
+        />
+      ) : (
+        <>
+          <MapSection
+            query={query}
+            hit={hit}
+            onPin={handlePinClick}
+          />
+          <LifeCycle cur={stage} setCur={setStage} />
+          <ServiceCards stage={stage} activeServiceId={hit.id} />
+        </>
+      )}
+
       <TabBar active={tab} onChange={setTab} />
       <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
       <DebugWidth />

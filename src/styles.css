@@ -1615,24 +1615,317 @@ button {
    white-space: nowrap
 }
 
-/* Debug (ServiceCards > Card): dedicated self-contained label for
-   each .card, anchored to that card's own top-left. */
-.app.debug .cards .card {
-   position: relative
+/* ============================================================
+   SERVICES TABULAR VIEW & MORPHING SEARCH
+   ============================================================ */
+
+/* Morphing Search Box */
+.morphing-search {
+   position: fixed;
+   z-index: 90;
+   transition: all 0.68s cubic-bezier(0.32, 0.72, 0, 1);
+   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
 }
-.app.debug .cards .card::before {
-   content: "ServiceCards / Card  .card";
-   position: absolute;
-   top: 0;
-   left: 0;
-   transform: translateY(-100%);
-   z-index: 9999;
+
+/* Default docked in top right header */
+.morphing-search.docked-header {
+   top: calc(28px + env(safe-area-inset-top));
+   right: max(24px, calc(50% - 960px));
+   width: min(340px, calc(100vw - 48px));
+   height: 52px;
+   background: #d1d5ee;
+   border-radius: 14px;
+}
+
+/* Docked into Services Tabular Header */
+.morphing-search.docked-table {
+   top: 140px;
+   right: max(40px, calc(50% - 960px));
+   width: min(380px, calc(100vw - 64px));
+   height: 48px;
+   background: #ffffff;
+   border: 1.5px solid #2f7f82;
+   border-radius: 12px;
+   box-shadow: 0 8px 26px rgba(10, 48, 38, 0.25);
+   transform: translateY(0);
+}
+
+.morphing-search input {
+   width: 100%;
+   height: 100%;
+   border: 0;
+   background: transparent;
+   padding: 0 8px;
+   font: 500 15px Inter, sans-serif;
+   color: #1b2150;
+   outline: none;
+}
+
+/* Layanan Tabular Section */
+.services-tabular-section {
+   grid-column: 2 / span 2;
+   margin-top: 24px;
+   padding: 0 24px 60px;
+   animation: fadeInTabular 0.52s ease forwards;
+}
+
+@keyframes fadeInTabular {
+   from {
+      opacity: 0;
+      transform: translateY(16px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+.tabular-header-bar {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 20px;
+   min-height: 54px;
+   margin-bottom: 18px;
+}
+
+.tabular-title-group {
+   display: flex;
+   align-items: center;
+   gap: 14px;
+}
+
+.tabular-title-group h2 {
+   font-size: 24px;
+   font-weight: 700;
+   color: #fff;
+   margin: 0;
+   letter-spacing: -0.3px;
+}
+
+.tabular-count-badge {
+   background: rgba(47, 127, 130, 0.4);
+   color: #6ee7b7;
+   border: 1px solid rgba(110, 231, 183, 0.35);
+   font-size: 12px;
+   font-weight: 600;
+   padding: 4px 10px;
+   border-radius: 999px;
+}
+
+.search-dock-target {
+   width: 380px;
+   height: 48px;
    pointer-events: none;
-   padding: 1px 5px;
-   font: 600 10px/1.4 ui-monospace, monospace;
-   color: #fcb;
-   background: #000c;
-   border: 1px solid #fa06;
-   border-radius: 3px;
-   white-space: nowrap
+}
+
+/* Stage filter pills */
+.tabular-filter-pills {
+   display: flex;
+   gap: 8px;
+   overflow-x: auto;
+   padding-bottom: 14px;
+   margin-bottom: 8px;
+}
+
+.stage-pill-btn {
+   background: rgba(255, 255, 255, 0.08);
+   color: #cbd5e1;
+   border: 1px solid rgba(255, 255, 255, 0.12);
+   padding: 7px 16px;
+   border-radius: 999px;
+   font-size: 13px;
+   font-weight: 600;
+   cursor: pointer;
+   white-space: nowrap;
+   transition: all 0.25s ease;
+}
+
+.stage-pill-btn:hover {
+   background: rgba(255, 255, 255, 0.15);
+   color: #fff;
+}
+
+.stage-pill-btn.active {
+   background: #087a58;
+   color: #fff;
+   border-color: #34d399;
+   box-shadow: 0 4px 14px rgba(8, 122, 88, 0.4);
+}
+
+/* Card container for table */
+.tabular-card {
+   background: rgba(15, 34, 46, 0.85);
+   backdrop-filter: blur(16px);
+   border: 1px solid rgba(255, 255, 255, 0.12);
+   border-radius: 18px;
+   overflow: hidden;
+   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.tabular-loading,
+.tabular-empty {
+   padding: 48px;
+   text-align: center;
+   color: #94a3b8;
+   font-size: 14px;
+}
+
+.tabular-table-wrapper {
+   width: 100%;
+   overflow-x: auto;
+}
+
+.services-table {
+   width: 100%;
+   border-collapse: collapse;
+   text-align: left;
+}
+
+.services-table th {
+   background: rgba(255, 255, 255, 0.04);
+   color: #94a3b8;
+   font-size: 12px;
+   text-transform: uppercase;
+   letter-spacing: 0.6px;
+   font-weight: 700;
+   padding: 16px 20px;
+   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.services-table td {
+   padding: 16px 20px;
+   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+   vertical-align: middle;
+}
+
+.services-table tr:hover td {
+   background: rgba(255, 255, 255, 0.03);
+}
+
+.table-icon-box {
+   width: 40px;
+   height: 40px;
+   border-radius: 10px;
+   background: rgba(47, 127, 130, 0.25);
+   border: 1px solid rgba(110, 231, 183, 0.3);
+   color: #6ee7b7;
+   display: grid;
+   place-items: center;
+}
+
+.table-service-title {
+   font-weight: 600;
+   font-size: 15px;
+   color: #f8fafc;
+}
+
+.table-service-link {
+   display: inline-block;
+   margin-top: 3px;
+   font-size: 12px;
+   color: #38bdf8;
+   text-decoration: none;
+}
+
+.table-service-link:hover {
+   text-decoration: underline;
+}
+
+.table-stage-badge {
+   display: inline-block;
+   background: rgba(255, 255, 255, 0.07);
+   border: 1px solid rgba(255, 255, 255, 0.12);
+   color: #e2e8f0;
+   padding: 4px 10px;
+   border-radius: 8px;
+   font-size: 12px;
+   font-weight: 500;
+}
+
+.table-map-pin-btn {
+   background: rgba(13, 148, 136, 0.2);
+   border: 1px solid rgba(20, 184, 166, 0.4);
+   color: #5eead4;
+   padding: 4px 10px;
+   border-radius: 6px;
+   font-size: 11px;
+   font-family: monospace;
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.2s ease;
+}
+
+.table-map-pin-btn:hover {
+   background: rgba(13, 148, 136, 0.4);
+   transform: translateY(-1px);
+}
+
+.table-non-map {
+   font-size: 11px;
+   color: #64748b;
+}
+
+.table-btn-primary {
+   display: inline-block;
+   background: #087a58;
+   color: #fff;
+   text-decoration: none;
+   padding: 6px 14px;
+   border-radius: 8px;
+   font-size: 13px;
+   font-weight: 600;
+   transition: background 0.2s;
+}
+
+.table-btn-primary:hover {
+   background: #0b936b;
+}
+
+.table-btn-secondary {
+   background: rgba(255, 255, 255, 0.08);
+   color: #e2e8f0;
+   border: 1px solid rgba(255, 255, 255, 0.15);
+   padding: 6px 14px;
+   border-radius: 8px;
+   font-size: 13px;
+   font-weight: 500;
+   cursor: pointer;
+}
+
+.table-btn-secondary:hover {
+   background: rgba(255, 255, 255, 0.15);
+}
+
+/* Hide side portraits in Layanan mode to give maximum wide room */
+.app.layanan-mode .side-portrait.left,
+.app.layanan-mode .side-portrait.right {
+   opacity: 0;
+   transform: scale(0.6);
+   pointer-events: none;
+}
+
+.app.layanan-mode {
+   grid-template-columns: 0px minmax(0, 1fr) minmax(0, 1fr) 0px;
+}
+
+@media (max-width: 1099px) {
+   .morphing-search.docked-header {
+      top: 18px;
+      right: 16px;
+      width: calc(100vw - 32px);
+      height: 44px;
+   }
+   .morphing-search.docked-table {
+      position: static;
+      width: 100%;
+      margin-bottom: 12px;
+   }
+   .search-dock-target {
+      display: none;
+   }
+   .services-tabular-section {
+      padding: 0 16px 80px;
+   }
 }

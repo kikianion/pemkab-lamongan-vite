@@ -3,8 +3,7 @@ import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
 import TabBar from './TabBar'
 
-export default function Header({ onSearch, active, onChange }) {
-  const [q, setQ] = useState('')
+export default function Header({ active, onChange, children }) {
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
   const initialMapTop = useRef(0)
@@ -17,7 +16,6 @@ export default function Header({ onSearch, active, onChange }) {
       if (m) initialMapTop.current = m.getBoundingClientRect().top + window.scrollY
     }
     const onScroll = () => {
-      // only collapse below the desktop breakpoint
       if (window.innerWidth >= 1100) { setCollapsed(false); return }
       const m = mapEl()
       if (!m) return
@@ -37,18 +35,17 @@ export default function Header({ onSearch, active, onChange }) {
 
   return (
     <header className="top" ref={topRef}>
-      <form className={`search${collapsed ? ' collapsed' : ''}`} role="search" onSubmit={(e) => { e.preventDefault(); onSearch(q.trim()) }}>
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-          <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" />
-        </svg>
-        <input type="search" placeholder="Cari layanan..." aria-label="Cari layanan" autoComplete="off" value={q} onChange={(e) => setQ(e.target.value)} />
-        <button type="submit">Go</button>
-      </form>
+      {/* Header Search Slot - Children passed from App for FLIP morphing */}
+      <div className={`header-search-slot${collapsed ? ' collapsed' : ''}`}>
+        {children}
+      </div>
+
       <div className="brand">
         <img className="avatar" src={left} alt="Bupati Lamongan" />
         <h1>PEMKAB LAMONGAN</h1>
         <img className="avatar" src={right} alt="Wakil Bupati Lamongan" />
       </div>
+
       <div className="tabs--header">
         <TabBar active={active} onChange={onChange} />
       </div>
