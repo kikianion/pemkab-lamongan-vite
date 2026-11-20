@@ -22,7 +22,7 @@ function JoystickButton({ area, label, disabled, onClick, children }) {
   )
 }
 
-export default function MapSection({ query, hit, onPin }) {
+export default function MapSection({ query, hit, onPin, currentStage }) {
   const q = (query || '').toLowerCase()
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
@@ -113,6 +113,9 @@ export default function MapSection({ query, hit, onPin }) {
 
   const onPointerUp = () => { drag.current = null }
 
+  // Target stage ID is 1-indexed (currentStage 0 -> stage_id 1)
+  const activeStageId = typeof currentStage === 'number' ? currentStage + 1 : null
+
   return (
     <section
       className={`map${canDrag ? ' draggable' : ''}`}
@@ -128,11 +131,14 @@ export default function MapSection({ query, hit, onPin }) {
       >
         <img src={map} alt="Peta Kabupaten Lamongan" draggable={false} />
         {markers.map((p) => {
-          const hidden = q && !p.name.toLowerCase().includes(q)
+          const matchQuery = !q || p.name.toLowerCase().includes(q)
+          const matchStage = activeStageId === null || p.stage_id === activeStageId
+          const isVisible = matchQuery && matchStage
+
           return (
             <button
               key={`${p.id}-${hit.id === p.id ? hit.tick : 0}`}
-              className={`pin${hidden ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
+              className={`pin${!isVisible ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
               data-tone={p.tone}
               style={{ left: `${p.left}%`, top: `${p.top}%`, '--pin-scale': 1 / scale }}
               onClick={(e) => {

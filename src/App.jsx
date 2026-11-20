@@ -113,6 +113,7 @@ export default function App() {
             query={query}
             hit={hit}
             onPin={handlePinClick}
+            currentStage={stage}
           />
           <LifeCycle cur={stage} setCur={setStage} />
           <ServiceCards stage={stage} activeServiceId={hit.id} />
