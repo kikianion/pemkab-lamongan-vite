@@ -169,6 +169,11 @@ button {
    text-align: center
 }
 
+/* Brand logo GIF container: hidden on mobile/tablet */
+.brand-logo-wrap {
+   display: none;
+}
+
 /* Brand row: circular user avatar image */
 .avatar {
    width: 71px;
@@ -1169,8 +1174,24 @@ button {
       grid-column: 1;
       grid-row: 1;
       margin-top: 0;
-      gap: 24px;
-      justify-content: flex-start
+      gap: 16px;
+      justify-content: flex-start;
+      align-items: center
+   }
+
+   /* Desktop: show animated logo at left of brand title */
+   .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+   }
+
+   .brand-logo-desktop {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
    }
 
    /* Desktop: brand title sizing */
@@ -1223,13 +1244,15 @@ button {
       height: 100%;
       min-height: 640px;
       position: relative;
+      align-self: start;
       transition: all 0.68s cubic-bezier(0.32, 0.72, 0, 1);
    }
 
    /* Desktop: map image fades out on right edge */
    .map-canvas>img {
       -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent);
-      mask-image: linear-gradient(90deg, #000 88%, transparent)
+      mask-image: linear-gradient(90deg, #000 88%, transparent);
+      object-position: center top;
    }
 
    /* Desktop: zoom/pan controls move to top-left */
@@ -1272,9 +1295,9 @@ button {
    .life {
       grid-area: life;
       margin: 0;
-      padding: 40px 40px 0 28px;
+      padding: 0 40px 0 28px;
       align-self: start;
-      height: 350px;
+      height: auto;
    }
 
    /* Desktop: life-cycle title size */
@@ -1355,7 +1378,8 @@ button {
       grid-area: cards;
       grid-template-columns: 1fr;
       gap: 14px;
-      padding: 10px 40px 0 28px;
+      padding: 0 40px 0 28px;
+      align-self: start;
       align-content: start
    }
 
