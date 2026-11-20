@@ -1079,6 +1079,8 @@ button {
       grid-template-areas: "top top top top" "bupati map life wakil" "bupati map cards wakil";
       align-content: start;
       padding-bottom: 140px;
+      transition: grid-template-columns 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                  padding 0.45s cubic-bezier(0.4, 0, 0.2, 1);
    }
 
    /* Desktop: header full width; title left, tabs centered, search right */
@@ -1094,7 +1096,10 @@ button {
       padding: calc(28px + env(safe-area-inset-top)) 40px 28px;
       border-radius: 0;
       width: 100vw;
-      xmargin-left: calc(50% - 50vw)
+      xmargin-left: calc(50% - 50vw);
+      transition: opacity 0.35s ease, max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), margin 0.35s ease, transform 0.4s ease;
+      max-height: 200px;
+      overflow: hidden;
    }
 
    /* Desktop: search bar on the right of the header */
@@ -1144,7 +1149,8 @@ button {
       border: 2.5px solid #2f7f82;
       box-shadow: 0 4px 12px #0006;
       background: #26439f;
-      margin: 0 auto
+      margin: 0 auto;
+      transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
    }
    .side-portrait.left {
       grid-area: bupati;
@@ -1164,7 +1170,8 @@ button {
       aspect-ratio: auto;
       height: 100%;
       min-height: 640px;
-      position: relative
+      position: relative;
+      transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
    }
 
    /* Desktop: map image fades out on right edge */
@@ -1358,20 +1365,32 @@ button {
       display: none
    }
 
-   /* Desktop Map Mode: Map fills the entire left column (replaces bupati portrait area) */
+   /* Desktop Map Mode: Map fills the entire left column (smooth expansion) */
    .app.map-mode {
-      grid-template-columns: minmax(0, 1.8fr) minmax(380px, 1fr);
-      grid-template-rows: auto 1fr;
-      grid-template-areas:
-         "map life"
-         "map cards";
+      grid-template-columns: 0px minmax(0, 1.8fr) minmax(380px, 1fr) 0px;
+      grid-template-rows: 0px auto 1fr;
       padding-top: 0;
    }
 
-   .app.map-mode .top,
-   .app.map-mode .side-portrait.left,
+   .app.map-mode .top {
+      opacity: 0;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+   }
+
+   .app.map-mode .side-portrait.left {
+      opacity: 0;
+      transform: scale(0.6) translateX(-40px);
+      pointer-events: none;
+   }
+
    .app.map-mode .side-portrait.right {
-      display: none !important;
+      opacity: 0;
+      transform: scale(0.6) translateX(40px);
+      pointer-events: none;
    }
 
    .app.map-mode .map {
@@ -1386,26 +1405,43 @@ button {
    .app.map-mode .map-canvas > img {
       -webkit-mask-image: none;
       mask-image: none;
+      transition: -webkit-mask-image 0.4s ease, mask-image 0.4s ease;
    }
 
    /* Floating back/exit navigation on desktop map mode */
+   .app > .tabs.floating-tabs {
+      display: none;
+   }
+
    .app.map-mode > .tabs {
       display: flex !important;
       position: fixed;
       top: 24px;
       left: 28px;
       bottom: auto;
-      transform: none;
+      transform: translateY(-10px);
+      animation: floatNavEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       z-index: 100;
-      background: rgba(12, 38, 30, 0.88);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      background: rgba(12, 38, 30, 0.9);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
       border-radius: 999px;
       padding: 6px 14px;
       gap: 6px;
       width: auto;
       height: auto;
+   }
+
+   @keyframes floatNavEnter {
+      from {
+         opacity: 0;
+         transform: translateY(-14px) scale(0.95);
+      }
+      to {
+         opacity: 1;
+         transform: translateY(0) scale(1);
+      }
    }
 
    .app.map-mode > .tabs a {
@@ -1424,7 +1460,19 @@ button {
 
 /* Map mode on mobile / tablet */
 @media (max-width: 1099px) {
-   .app.map-mode .top,
+   .top, .side-portrait {
+      transition: opacity 0.35s ease, max-height 0.45s ease;
+   }
+
+   .app.map-mode .top {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      padding-top: 0;
+      padding-bottom: 0;
+      pointer-events: none;
+   }
+
    .app.map-mode .side-portrait {
       display: none !important;
    }
@@ -1432,6 +1480,7 @@ button {
    .app.map-mode .map {
       min-height: calc(100vh - 120px);
       height: auto;
+      transition: min-height 0.45s ease;
    }
 }
 
