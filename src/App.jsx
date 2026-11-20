@@ -88,7 +88,12 @@ export default function App() {
         )}
       </form>
 
-      <Header active={tab} onChange={setTab}>
+      {/* Single persistent morphing TabBar (ghost glide animation between header center and top-left map pill) */}
+      <div className={`nav-morph-container ${isMapMode ? 'docked-map' : 'docked-header'}`}>
+        <TabBar active={tab} onChange={setTab} />
+      </div>
+
+      <Header>
         {/* Placeholder spacer in header grid */}
         <div className="header-search-anchor" />
       </Header>
@@ -114,7 +119,11 @@ export default function App() {
         </>
       )}
 
-      <TabBar active={tab} onChange={setTab} />
+      {/* Mobile bottom navigation */}
+      <div className="mobile-bottom-tabs">
+        <TabBar active={tab} onChange={setTab} />
+      </div>
+
       <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
       <DebugWidth />
     </main>

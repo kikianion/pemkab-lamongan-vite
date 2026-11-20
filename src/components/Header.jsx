@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
-import TabBar from './TabBar'
 
-export default function Header({ active, onChange, children }) {
+export default function Header({ children, navSlot }) {
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
   const initialMapTop = useRef(0)
@@ -35,7 +34,7 @@ export default function Header({ active, onChange, children }) {
 
   return (
     <header className="top" ref={topRef}>
-      {/* Header Search Slot - Children passed from App for FLIP morphing */}
+      {/* Header Search Slot */}
       <div className={`header-search-slot${collapsed ? ' collapsed' : ''}`}>
         {children}
       </div>
@@ -46,8 +45,9 @@ export default function Header({ active, onChange, children }) {
         <img className="avatar" src={right} alt="Wakil Bupati Lamongan" />
       </div>
 
+      {/* Target anchor slot for the desktop navigation buttons */}
       <div className="tabs--header">
-        <TabBar active={active} onChange={onChange} />
+        {navSlot}
       </div>
     </header>
   )

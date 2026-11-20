@@ -1317,20 +1317,32 @@ button {
       font-size: 20px
    }
 
-   /* Desktop: hide the bottom tab bar (header tab bar takes over) */
-   .app > .tabs {
-      display: none
+   /* Desktop: single morphing navigation bar */
+   .app > .tabs,
+   .mobile-bottom-tabs {
+      display: none;
    }
 
-   /* Desktop: header tab bar centered between title and search */
-   .tabs--header {
-      display: block;
-      grid-column: 2;
-      grid-row: 1;
-      justify-self: center;
-      margin-top: 0
+   .nav-morph-container {
+      position: fixed;
+      z-index: 100;
+      transition: all 0.68s cubic-bezier(0.32, 0.72, 0, 1);
    }
-   .tabs--header .tabs {
+
+   /* Normal header position (center of top bar) */
+   .nav-morph-container.docked-header {
+      top: calc(28px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%);
+      background: none;
+      backdrop-filter: none;
+      border: 0;
+      box-shadow: none;
+      border-radius: 999px;
+      padding: 0;
+   }
+
+   .nav-morph-container.docked-header .tabs {
       position: static;
       transform: none;
       left: auto;
@@ -1345,24 +1357,76 @@ button {
       border: 0;
       box-shadow: none;
       backdrop-filter: none;
-      z-index: auto
    }
-   .tabs--header .tabs a {
+
+   .nav-morph-container.docked-header .tabs a {
       flex-direction: row;
       gap: 8px;
       padding: 8px 18px;
       border-radius: 999px;
-      transition: background .2s, color .2s
+      transition: background 0.3s, color 0.3s;
    }
-   .tabs--header .tabs a svg {
+
+   .nav-morph-container.docked-header .tabs a svg {
       width: 20px;
-      height: 20px
+      height: 20px;
    }
-   .tabs--header .tabs a.on {
-      background: #ffffff1a
+
+   .nav-morph-container.docked-header .tabs a.on {
+      background: #ffffff1a;
    }
-   .tabs--header .tabs a.on::before {
-      display: none
+
+   .nav-morph-container.docked-header .tabs a.on::before {
+      display: none;
+   }
+
+   /* Ghost glide position in Map Mode (glides smoothly to top-left floating glassmorphism pill) */
+   .nav-morph-container.docked-map {
+      top: 24px;
+      left: 28px;
+      transform: translateX(0);
+      background: rgba(12, 38, 30, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(47, 127, 130, 0.3);
+      border-radius: 999px;
+      padding: 6px 14px;
+   }
+
+   .nav-morph-container.docked-map .tabs {
+      position: static;
+      transform: none;
+      display: flex;
+      gap: 6px;
+      background: none;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      padding: 0;
+      width: auto;
+      height: auto;
+   }
+
+   .nav-morph-container.docked-map .tabs a {
+      flex-direction: row;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      border-radius: 999px;
+      transition: background 0.3s, color 0.3s;
+   }
+
+   .nav-morph-container.docked-map .tabs a svg {
+      width: 18px;
+      height: 18px;
+   }
+
+   .nav-morph-container.docked-map .tabs a.on {
+      background: #ffffff1a;
+   }
+
+   .nav-morph-container.docked-map .tabs a.on::before {
+      display: none;
    }
 
    /* Desktop Map Mode: Map fills the entire left column (smooth expansion) */
@@ -1407,59 +1471,16 @@ button {
       mask-image: none;
       transition: -webkit-mask-image 0.6s ease, mask-image 0.6s ease;
    }
-
-   /* Floating back/exit navigation on desktop map mode */
-   .app > .tabs.floating-tabs {
-      display: none;
-   }
-
-   .app.map-mode > .tabs {
-      display: flex !important;
-      position: fixed;
-      top: 24px;
-      left: 28px;
-      bottom: auto;
-      transform: translateY(-10px);
-      animation: floatNavEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      z-index: 100;
-      background: rgba(12, 38, 30, 0.9);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
-      border-radius: 999px;
-      padding: 6px 14px;
-      gap: 6px;
-      width: auto;
-      height: auto;
-   }
-
-   @keyframes floatNavEnter {
-      from {
-         opacity: 0;
-         transform: translateY(-14px) scale(0.95);
-      }
-      to {
-         opacity: 1;
-         transform: translateY(0) scale(1);
-      }
-   }
-
-   .app.map-mode > .tabs a {
-      flex-direction: row;
-      gap: 6px;
-      padding: 6px 14px;
-      font-size: 13px;
-      border-radius: 999px;
-   }
-
-   .app.map-mode > .tabs a svg {
-      width: 18px;
-      height: 18px;
-   }
 }
 
 /* Map mode on mobile / tablet */
 @media (max-width: 1099px) {
+   .nav-morph-container {
+      display: none;
+   }
+   .mobile-bottom-tabs {
+      display: block;
+   }
    .top, .side-portrait {
       transition: opacity 0.52s ease, max-height 0.68s cubic-bezier(0.32, 0.72, 0, 1);
    }
