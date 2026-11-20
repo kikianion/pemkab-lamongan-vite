@@ -19,8 +19,12 @@ export default function ServiceCards({ stage, activeServiceId }) {
     return () => { isMounted = false }
   }, [])
 
-  // Filter based on selected lifecycle stage
-  const currentServices = services.filter((s) => s.stage_id === (stage + 1))
+  const isAll = stage === 'all'
+
+  // Filter based on selected lifecycle stage or show all
+  const currentServices = isAll
+    ? services
+    : services.filter((s) => s.stage_id === (stage + 1))
 
   // Fallback to static CARDS if API returns empty
   const displayItems = currentServices.length > 0
@@ -29,6 +33,13 @@ export default function ServiceCards({ stage, activeServiceId }) {
         icon: s.icon,
         title: s.title,
         url: s.url,
+      }))
+    : isAll
+    ? Object.values(CARDS).flat().map(([icon, title]) => ({
+        id: title,
+        icon,
+        title,
+        url: null,
       }))
     : (CARDS[stage] || []).map(([icon, title]) => ({
         id: title,
