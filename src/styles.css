@@ -2021,8 +2021,12 @@ button {
 }
 
 @media (max-width: 1099px) {
+   /* Reserve space in header for the fixed floating search */
+   .header-search-anchor {
+      height: 44px;
+   }
    .morphing-search.docked-header {
-      top: 18px;
+      top: calc(32px + env(safe-area-inset-top));
       right: 16px;
       width: calc(100vw - 32px);
       height: 44px;
@@ -2037,5 +2041,12 @@ button {
    }
    .services-tabular-section {
       padding: 0 16px 80px;
+   }
+}
+
+/* Tablet: header top padding is 36px, so search follows it */
+@media (min-width: 768px) and (max-width: 1099px) {
+   .morphing-search.docked-header {
+      top: calc(36px + env(safe-area-inset-top));
    }
 }
