@@ -18,16 +18,18 @@ export default function App() {
   const [hit, setHit] = useState({ id: null, tick: 0 })
   const [tab, setTab] = useState('Beranda')
 
+  // Map marker click: highlight only, do not change lifecycle stage
   const handlePinClick = (pin) => {
     setHit((h) => ({ id: pin.id, tick: h.tick + 1 }))
-    if (typeof pin.stage_id === 'number') {
-      setStage(pin.stage_id - 1)
-    }
   }
 
+  // "View on map" from Layanan table: keep stage sync
   const handleViewOnMap = (service) => {
     setTab('Peta')
     handlePinClick(service)
+    if (typeof service.stage_id === 'number') {
+      setStage(service.stage_id - 1)
+    }
   }
 
   const isMapMode = tab === 'Peta'

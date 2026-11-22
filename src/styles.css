@@ -1133,14 +1133,15 @@ button {
    /* Desktop: grid layout - header top, map left, life/cards right */
    .app {
       max-width: 2000px;
+      height: 100dvh;
       min-height: 100dvh;
-      overflow-x: visible;
+      overflow: hidden;
       display: grid;
       grid-template-columns: 250px minmax(0, 1.25fr) minmax(380px, 1.0fr) 250px;
       grid-template-rows: auto auto 1fr;
       grid-template-areas: "top top top top" "bupati map life wakil" "bupati map cards wakil";
-      align-content: start;
-      padding-bottom: 140px;
+      align-content: stretch;
+      padding-bottom: 24px;
       transition: grid-template-columns 0.68s cubic-bezier(0.32, 0.72, 0, 1),
                   padding 0.68s cubic-bezier(0.32, 0.72, 0, 1);
    }
@@ -1390,8 +1391,12 @@ button {
       grid-template-columns: 1fr;
       gap: 14px;
       padding: 0 40px 0 28px;
-      align-self: start;
-      align-content: start
+      align-self: stretch;
+      align-content: start;
+      min-height: 0;
+      height: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
    }
 
    /* Desktop: service card height (0.5x of 112px) */
