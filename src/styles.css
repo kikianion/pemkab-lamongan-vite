@@ -245,6 +245,11 @@ button {
    -webkit-user-drag: none
 }
 
+.map-canvas{
+
+   max-height: 80vh;
+}
+
 /* Map: zoom/pan control group (bottom-right on mobile/tablet) */
 .map-zoom {
    position: absolute;
