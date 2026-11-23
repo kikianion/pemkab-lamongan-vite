@@ -2066,3 +2066,191 @@ button {
       top: calc(36px + env(safe-area-inset-top));
    }
 }
+
+/* ============================================================
+   LIFE CYCLE v2 (layout-stable)
+   Active state is visual only: it never changes box sizes, so
+   nothing reflows or pushes content below. Rail line and
+   chevrons derive from the same size variables.
+   ============================================================ */
+.life {
+   --ic: 58px;
+   --lb-mt: 15px;
+   --lb-h: 38px;
+   --lb-fs: 13.5px;
+   --tr-mt: 6px;
+   --tr-h: 10px;
+   --arw: 26px;
+   --lift: 14px;
+   --card-ext: 56px;
+   --card-r: 34px;
+   --chip-pad: 6px 15px;
+   --chip-fs: 13px;
+   --track-b: calc(var(--ic) + var(--lb-mt) + var(--lb-h) + var(--tr-mt) + var(--tr-h));
+   --line-y: calc(var(--ic) + var(--lb-mt) + var(--lb-h) + var(--tr-mt) + var(--tr-h) / 2);
+   height: auto;
+}
+
+.life .life-body {
+   position: relative;
+   height: calc(var(--lift) + var(--track-b) + var(--card-ext));
+   pointer-events: none;
+}
+
+.life .rail {
+   display: flex;
+   align-items: flex-start;
+   position: relative;
+   margin: var(--lift) 0 0;
+   padding: 0 calc(var(--arw) + 6px);
+   height: var(--track-b);
+   pointer-events: auto;
+}
+
+.life .rail::before {
+   left: calc(var(--arw) + 4px);
+   right: calc(var(--arw) + 4px);
+   top: var(--line-y);
+   height: 1.5px;
+   transform: translateY(-50%);
+}
+
+.life .item,
+.life .item.on {
+   flex: 1 1 0;
+   min-width: 0;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   border-radius: 0;
+   background: none;
+   box-shadow: none;
+   position: relative;
+   z-index: 1;
+}
+
+.life .item::before {
+   content: "";
+   position: absolute;
+   z-index: -1;
+   left: -2px;
+   right: -2px;
+   top: calc(var(--lift) * -1 + 4px);
+   bottom: calc(var(--card-ext) * -1);
+   background: linear-gradient(#3a2b86, #1d2257 60%, #1b2152);
+   border: 1.5px solid #6a5cd6;
+   border-radius: var(--card-r) var(--card-r) 15px 15px;
+   box-shadow: 0 0 26px #6a4ce566, inset 0 0 18px #7a63ff33;
+   opacity: 0;
+   transition: opacity .25s ease;
+   pointer-events: none;
+}
+
+.life .item.on::before {
+   opacity: 1;
+}
+
+.life .item .ic,
+.life .item.on .ic {
+   width: var(--ic);
+   height: var(--ic);
+   transition: transform .25s ease, background .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+.life .item.on .ic {
+   transform: scale(1.04);
+}
+
+.life .item .lb,
+.life .item.on .lb {
+   margin-top: var(--lb-mt);
+   height: var(--lb-h);
+   font-size: var(--lb-fs);
+   line-height: 1.15;
+}
+
+.life .item .tr,
+.life .item.on .tr {
+   height: var(--tr-h);
+   margin-top: var(--tr-mt);
+}
+
+.life .item .tr::before {
+   top: calc(var(--tr-h) / 2 - .75px);
+}
+
+.life .item .chip,
+.life .item.on .chip {
+   display: block;
+   position: absolute;
+   left: 50%;
+   top: calc(var(--track-b) + 9px);
+   transform: translateX(-50%);
+   margin: 0;
+   padding: var(--chip-pad);
+   font-size: var(--chip-fs);
+   line-height: 1;
+   white-space: nowrap;
+   border-radius: 14px;
+   opacity: 0;
+   pointer-events: none;
+   transition: opacity .25s ease;
+}
+
+.life .item.on .chip {
+   opacity: 1;
+}
+
+.life .arrow {
+   position: absolute;
+   top: calc(var(--lift) + var(--line-y));
+   bottom: auto;
+   transform: translateY(-50%);
+   width: var(--arw);
+   height: var(--arw);
+   padding: 0;
+   display: grid;
+   place-items: center;
+   background: none;
+   border: 0;
+   z-index: 2;
+}
+
+.life .arrow.l { left: 0; right: auto; }
+.life .arrow.r { right: 0; left: auto; }
+
+.life .arrow svg {
+   width: var(--arw);
+   height: var(--arw);
+}
+
+@media (min-width: 768px) {
+   .life {
+      --ic: 78px;
+      --lb-mt: 18px;
+      --lb-h: 48px;
+      --lb-fs: 17px;
+      --tr-mt: 8px;
+      --tr-h: 12px;
+      --arw: 34px;
+      --lift: 14px;
+      --card-ext: 70px;
+      --card-r: 44px;
+      --chip-pad: 8px 22px;
+      --chip-fs: 16px;
+      padding-bottom: 30px;
+   }
+}
+
+@media (min-width: 1100px) {
+   .life {
+      --ic: 64px;
+      --lb-h: 42px;
+      --lb-fs: 14.5px;
+      --card-ext: 64px;
+      --card-r: 34px;
+      --chip-pad: 7px 16px;
+      --chip-fs: 14px;
+      padding-bottom: 0;
+   }
+}

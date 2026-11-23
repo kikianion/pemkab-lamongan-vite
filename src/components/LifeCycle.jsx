@@ -28,6 +28,7 @@ export default function LifeCycle({ cur, setCur }) {
         </button>
       </div>
 
+      <div className="life-body">
       <div
         className="rail"
         onPointerDown={(e) => (x0.current = e.clientX)}
@@ -55,6 +56,7 @@ export default function LifeCycle({ cur, setCur }) {
       </div>
       <button className="arrow l" aria-label="Sebelumnya" disabled={curNum <= 0} onClick={() => go(curNum - 1)}><Chevron d="m15 5-7 7 7 7" /></button>
       <button className="arrow r" aria-label="Berikutnya" disabled={curNum >= STAGES.length - 1} onClick={() => go(curNum + 1)}><Chevron d="m9 5 7 7-7 7" /></button>
+      </div>
     </section>
   )
 }
