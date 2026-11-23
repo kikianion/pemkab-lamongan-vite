@@ -6,6 +6,7 @@ import Header from './components/Header'
 import MapSection from './components/MapSection'
 import LifeCycle from './components/LifeCycle'
 import DebugWidth from './components/DebugWidth'
+import DebugOverlay from './components/DebugOverlay'
 import ServiceCards from './components/ServiceCards'
 import ServicesTable from './components/ServicesTable'
 import TabBar from './components/TabBar'
@@ -129,6 +130,7 @@ export default function App() {
 
       <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
       <DebugWidth />
+      {import.meta.env.VITE_DEBUG_UI === 'true' && <DebugOverlay />}
     </main>
   )
 }

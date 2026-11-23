@@ -1711,6 +1711,51 @@ button {
    white-space: nowrap
 }
 
+/* Debug overlay (VITE_DEBUG_UI=true): outline every element, hover shows tag#id.class */
+body.debug-ui *:not(.debug-overlay):not(.debug-overlay *) {
+   outline: 1px solid rgba(255, 0, 120, 0.35);
+   outline-offset: -1px
+}
+.debug-overlay {
+   position: fixed;
+   inset: 0;
+   z-index: 2147483647;
+   pointer-events: none
+}
+.debug-overlay__label {
+   position: fixed;
+   max-width: 260px;
+   padding: 0 3px;
+   font: 600 9px/1.3 ui-monospace, monospace;
+   color: #fff;
+   background: rgba(220, 0, 100, 0.85);
+   border-radius: 0 0 3px 0;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   pointer-events: none
+}
+.debug-overlay__box {
+   position: fixed;
+   background: rgba(0, 170, 255, 0.18);
+   outline: 2px solid #0af !important
+}
+.debug-overlay__tip {
+   position: fixed;
+   max-width: 300px;
+   padding: 2px 6px;
+   font: 600 11px/1.4 ui-monospace, monospace;
+   color: #bff;
+   background: #000d;
+   border: 1px solid #0ff6;
+   border-radius: 3px;
+   word-break: break-all
+}
+.debug-overlay__tip span {
+   color: #fc6;
+   font-weight: 400
+}
+
 /* Debug (ServiceCards): dedicated self-contained label.
    Sets its own position:relative so it works even though the
    shared anchor rule above is disabled (xposition). */
