@@ -9,13 +9,13 @@ function describe(el) {
   return s
 }
 
-export default function DebugOverlay() {
+export default function DebugOverlay({ level = 1 }) {
   const [info, setInfo] = useState(null)
   const [labels, setLabels] = useState([])
   const rootRef = useRef(null)
 
   useEffect(() => {
-    document.body.classList.add('debug-ui')
+    document.body.classList.add(level === 2 ? 'debug-ui2' : 'debug-ui')
 
     const onMove = (e) => {
       const el = e.target
@@ -35,13 +35,13 @@ export default function DebugOverlay() {
     const scan = () => {
       raf = 0
       const out = []
-      for (const el of document.body.querySelectorAll('[id], [class]')) {
+      for (const el of document.body.querySelectorAll(level === 2 ? '.debug2' : '[id], [class]')) {
         if (rootRef.current?.contains(el)) continue
         if (el.tagName.toLowerCase() !== 'svg' && el.closest('svg')) continue
         const r = el.getBoundingClientRect()
         if (r.width < 24 || r.height < 12) continue
         if (r.bottom < 0 || r.top > window.innerHeight || r.right < 0 || r.left > window.innerWidth) continue
-        out.push({ k: out.length, x: Math.max(r.left, 0), y: Math.max(r.top, 0), label: describe(el) })
+        out.push({ k: out.length, x: Math.max(r.left, 0), y: Math.max(r.top, 0), label: level === 2 && el.id ? '#' + el.id : describe(el) })
         if (out.length >= 300) break
       }
       setLabels(out)
@@ -62,10 +62,13 @@ export default function DebugOverlay() {
     const timer = setInterval(schedule, 500)
     schedule()
 
-    window.addEventListener('mousemove', onMove, true)
-    document.documentElement.addEventListener('mouseleave', onLeave)
+    setInfo(null)
+    if (level !== 2) {
+      window.addEventListener('mousemove', onMove, true)
+      document.documentElement.addEventListener('mouseleave', onLeave)
+    }
     return () => {
-      document.body.classList.remove('debug-ui')
+      document.body.classList.remove('debug-ui', 'debug-ui2')
       window.removeEventListener('mousemove', onMove, true)
       window.removeEventListener('scroll', schedule, true)
       window.removeEventListener('resize', schedule)
@@ -74,7 +77,7 @@ export default function DebugOverlay() {
       if (raf) cancelAnimationFrame(raf)
       document.documentElement.removeEventListener('mouseleave', onLeave)
     }
-  }, [])
+  }, [level])
 
   const tipLeft = info ? Math.min(info.x + 14, window.innerWidth - 320) : 0
   const tipTop = info ? Math.min(info.y + 18, window.innerHeight - 60) : 0
@@ -82,7 +85,7 @@ export default function DebugOverlay() {
   return (
     <div ref={rootRef} className="debug-overlay">
       {labels.map((l) => (
-        <div key={l.k} className="debug-overlay__label" style={{ left: l.x, top: l.y }}>
+        <div key={l.k} className={`debug-overlay__label${level === 2 ? ' debug-overlay__label--2' : ''}`} style={{ left: l.x, top: l.y }}>
           {l.label}
         </div>
       ))}

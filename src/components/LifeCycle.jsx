@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import Icon, { Lines } from './Icon'
 import { STAGES } from '../data'
 
@@ -6,8 +6,11 @@ const Chevron = ({ d }) => (
   <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
 )
 
+const CATEGORIES = ['Siklus hidup warga', 'Pariwisata', 'Industri', 'Dinas']
+
 export default function LifeCycle({ cur, setCur }) {
   const x0 = useRef(null)
+  const [cat, setCat] = useState(CATEGORIES[0])
   const isAll = cur === 'all'
   const curNum = typeof cur === 'number' ? cur : -1
 
@@ -15,6 +18,23 @@ export default function LifeCycle({ cur, setCur }) {
 
   return (
     <section className="life" aria-label="Siklus hidup warga">
+      <div className="life-cats" role="tablist" aria-label="Kategori">
+        {CATEGORIES.map((c) => (
+          <button
+            key={c}
+            type="button"
+            role="tab"
+            aria-selected={cat === c}
+            className={`life-cat${cat === c ? ' on' : ''}`}
+            onClick={(e) => {
+              setCat(c)
+              e.currentTarget.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+            }}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
       <div className="life-header-row">
         <h2>SIKLUS HIDUP WARGA</h2>
         <button

@@ -49,7 +49,7 @@ export default function ServiceCards({ stage, activeServiceId }) {
       }))
 
   return (
-    <section className="cards">
+    <section id='servicecards' className="cards debug2">
       {displayItems.map((item) => (
         <button
           className={`card${activeServiceId === item.id ? ' active' : ''}`}

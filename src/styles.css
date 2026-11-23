@@ -436,6 +436,11 @@ button {
    height: 250px;
 }
 
+/* Life Cycle: category button group (desktop only, enabled in min-width:1100px) */
+.life-cats {
+   display: none
+}
+
 /* Life Cycle: header row with title and All-stages button */
 .life-header-row {
    display: flex;
@@ -1312,6 +1317,54 @@ button {
       height: auto;
    }
 
+   /* Desktop: category button group above life-cycle header (horizontal scroll) */
+   .life-cats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      pointer-events: auto;
+      padding: 4px 2px
+   }
+   .life-cats::-webkit-scrollbar {
+      display: none
+   }
+   .life-cat {
+      flex: 0 0 auto;
+      font: 700 15px/1 Inter, sans-serif;
+      letter-spacing: .2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: #cbd5e1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 9px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none
+   }
+   .life-cat:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3)
+   }
+   .life-cat:focus-visible {
+      color: #fff;
+      border-color: #fff;
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.55)
+   }
+   .life-cat.on {
+      background: #087a58;
+      color: #fff;
+      border-color: #34d399;
+      box-shadow: 0 2px 10px rgba(8, 122, 88, 0.4)
+   }
+   .life-cat.on:focus-visible {
+      box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.55), 0 2px 10px rgba(8, 122, 88, 0.4)
+   }
+
    /* Desktop: life-cycle title size */
    .life h2 {
       font-size: 22px
@@ -1734,6 +1787,19 @@ body.debug-ui *:not(.debug-overlay):not(.debug-overlay *) {
    overflow: hidden;
    text-overflow: ellipsis;
    pointer-events: none
+}
+body.debug-ui2 .debug2 {
+   outline: 2px dashed rgba(255, 190, 0, 0.8);
+   outline-offset: -2px
+}
+.debug-overlay__label--2 {
+   font-size: 22px;
+   line-height: 1.2;
+   max-width: 90vw;
+   padding: 0 8px;
+   background: rgba(255, 170, 0, 0.92);
+   color: #1a1200;
+   border-radius: 0 0 4px 0
 }
 .debug-overlay__box {
    position: fixed;

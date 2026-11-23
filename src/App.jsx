@@ -130,7 +130,8 @@ export default function App() {
 
       <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
       <DebugWidth />
-      {import.meta.env.VITE_DEBUG_UI === 'true' && <DebugOverlay />}
+      {(import.meta.env.VITE_DEBUG_UI === 'true' || import.meta.env.VITE_DEBUG_UI === '1') && <DebugOverlay level={1} />}
+      {import.meta.env.VITE_DEBUG_UI === '2' && <DebugOverlay level={2} />}
     </main>
   )
 }
