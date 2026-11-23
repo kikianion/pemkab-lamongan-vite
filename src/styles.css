@@ -816,6 +816,25 @@ button {
    border: 1px solid #2b3560
 }
 
+/* Life panel wrapper: groups header row + body for the active category tab */
+.life .life-panel {
+   display: block;
+}
+
+/* Pariwisata panel: vertical list of cards, one per row */
+.life .cards.cards-vertical {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   padding: 14px 13px 0;
+}
+
+.life .cards.cards-vertical .card {
+   width: 100%;
+   min-height: 0;
+   align-items: center;
+}
+
 /* Service Cards: icon tile on the card */
 .card .tile {
    flex: none;

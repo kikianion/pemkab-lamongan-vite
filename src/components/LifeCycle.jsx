@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import Icon, { Lines } from './Icon'
-import { STAGES } from '../data'
+import { STAGES, TOURISM } from '../data'
 
 const Chevron = ({ d }) => (
   <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -44,6 +44,8 @@ export default function LifeCycle({ cur, setCur }) {
       </div>
       <button type="button" className="life-cats-arrow r" aria-label="Kategori berikutnya" onClick={() => scrollCats(1)}><Chevron d="m9 5 7 7-7 7" /></button>
       </div>
+      {cat === CATEGORIES[0] && (
+      <div className="life-panel" role="tabpanel" id="life-panel-siklus" aria-label={CATEGORIES[0]}>
       <div className="life-header-row xdebug2" id="life-header-row">
         <h2>SIKLUS HIDUP WARGA</h2>
         <button
@@ -86,6 +88,29 @@ export default function LifeCycle({ cur, setCur }) {
       <button className="arrow l" aria-label="Sebelumnya" disabled={curNum <= 0} onClick={() => go(curNum - 1)}><Chevron d="m15 5-7 7 7 7" /></button>
       <button className="arrow r" aria-label="Berikutnya" disabled={curNum >= STAGES.length - 1} onClick={() => go(curNum + 1)}><Chevron d="m9 5 7 7-7 7" /></button>
       </div>
+      </div>
+      )}
+
+      {cat === 'Pariwisata' && (
+      <div className="life-panel" role="tabpanel" id="life-panel-pariwisata" aria-label="Pariwisata">
+        <div className="life-header-row">
+          <h2>PARIWISATA</h2>
+        </div>
+        <div className="cards cards-vertical">
+          {TOURISM.map((item) => (
+            <button
+              className="card"
+              key={item.id}
+              type="button"
+              onClick={() => item.url && window.open(item.url, '_blank')}
+            >
+              <span className="tile"><Icon name={item.icon} /></span>
+              <b>{item.title}</b>
+            </button>
+          ))}
+        </div>
+      </div>
+      )}
     </section>
   )
 }
