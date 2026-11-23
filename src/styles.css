@@ -254,7 +254,7 @@ button {
 .map-zoom {
    position: absolute;
    right: 10px;
-   bottom: 10px;
+   bottom: 50px;
    z-index: 4;
    display: flex;
    flex-direction: column;
@@ -436,15 +436,87 @@ button {
    height: 250px;
 }
 
-/* Life Cycle: category button group (desktop only, enabled in min-width:1100px) */
+/* Life Cycle: category button group (mobile/tablet base; desktop overrides in min-width:1100px) */
 .life-cats {
+   display: flex;
+   gap: 8px;
+   margin-bottom: 14px;
+   overflow-x: auto;
+   scrollbar-width: none;
+   pointer-events: auto;
+   padding: 4px 2px
+}
+.life-cats::-webkit-scrollbar {
    display: none
+}
+.life-cat {
+   flex: 0 0 auto;
+   font: 700 12px/1 Inter, sans-serif;
+   letter-spacing: .2px;
+   text-transform: uppercase;
+   white-space: nowrap;
+   color: #cbd5e1;
+   background: rgba(255, 255, 255, 0.08);
+   border: 1px solid rgba(255, 255, 255, 0.16);
+   padding: 8px 13px;
+   border-radius: 999px;
+   cursor: pointer;
+   outline: none
+}
+.life-cat.on {
+   background: #087a58;
+   color: #fff
+}
+
+/* Life Cycle: category row with clickable left/right chevrons */
+.life-cats-wrap {
+   display: flex;
+   align-items: center;
+   gap: 6px;
+   margin-bottom: 14px;
+   pointer-events: auto
+}
+.life-cats-wrap .life-cats {
+   flex: 1 1 auto;
+   min-width: 0;
+   margin-bottom: 0
+}
+.life-cats-arrow {
+   flex: 0 0 auto;
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 30px;
+   height: 30px;
+   padding: 0;
+   color: #cbd5e1;
+   background: rgba(255, 255, 255, 0.08);
+   border: 1px solid rgba(255, 255, 255, 0.16);
+   border-radius: 50%;
+   cursor: pointer;
+   transition: background 0.2s ease, color 0.2s ease
+}
+.life-cats-arrow svg {
+   width: 18px;
+   height: 18px
+}
+.life-cats-arrow:hover {
+   background: rgba(255, 255, 255, 0.16);
+   color: #fff
+}
+.life-cats-arrow:focus-visible {
+   outline: none;
+   color: #fff;
+   box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.55)
 }
 
 /* Life Cycle: header row with title and All-stages button */
+.life-header-row h2 {
+   display: none
+}
 .life-header-row {
    display: flex;
-   justify-content: space-between;
+   justify-content: flex-end;
    align-items: center;
    margin-bottom: 24px;
    pointer-events: auto;
@@ -958,7 +1030,7 @@ button {
 
    /* Tablet: life-cycle section padding */
    .life {
-      margin-top: -25px;
+      margin-top: 0;
       padding: 0 32px;
       height: 335px;
    }

@@ -10,6 +10,11 @@ const CATEGORIES = ['Siklus hidup warga', 'Pariwisata', 'Industri', 'Dinas']
 
 export default function LifeCycle({ cur, setCur }) {
   const x0 = useRef(null)
+  const catsRef = useRef(null)
+  const scrollCats = (dir) => {
+    const el = catsRef.current
+    if (el) el.scrollBy({ left: dir * Math.max(120, el.clientWidth * 0.6), behavior: 'smooth' })
+  }
   const [cat, setCat] = useState(CATEGORIES[0])
   const isAll = cur === 'all'
   const curNum = typeof cur === 'number' ? cur : -1
@@ -18,7 +23,9 @@ export default function LifeCycle({ cur, setCur }) {
 
   return (
     <section className="life xdebug2" aria-label="Siklus hidup warga" id="life">
-      <div className="life-cats debug2" role="tablist" aria-label="Kategori" id="life-cats">
+      <div className="life-cats-wrap">
+      <button type="button" className="life-cats-arrow l" aria-label="Kategori sebelumnya" onClick={() => scrollCats(-1)}><Chevron d="m15 5-7 7 7 7" /></button>
+      <div ref={catsRef} className="life-cats xdebug2" role="tablist" aria-label="Kategori" id="life-cats">
         {CATEGORIES.map((c) => (
           <button
             key={c}
@@ -35,7 +42,9 @@ export default function LifeCycle({ cur, setCur }) {
           </button>
         ))}
       </div>
-      <div className="life-header-row debug2" id="life-header-row">
+      <button type="button" className="life-cats-arrow r" aria-label="Kategori berikutnya" onClick={() => scrollCats(1)}><Chevron d="m9 5 7 7-7 7" /></button>
+      </div>
+      <div className="life-header-row xdebug2" id="life-header-row">
         <h2>SIKLUS HIDUP WARGA</h2>
         <button
           type="button"
