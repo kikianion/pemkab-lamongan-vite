@@ -2227,6 +2227,18 @@ button {
    display: block;
 }
 
+/* Mobile: icons 15% smaller (58px -> 49px) to add space between stages */
+@media (max-width: 767px) {
+   .life {
+      --ic: 49px;
+   }
+
+   .life .item .ic svg {
+      width: 23px;
+      height: 23px;
+   }
+}
+
 @media (min-width: 768px) {
    .life {
       --ic: 78px;
