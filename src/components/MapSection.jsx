@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import map from '../assets/map_island_3d.svg'
+import CarAnimation from './CarAnimation'
 import Icon, { Lines } from './Icon'
 import { PINS as FALLBACK_PINS } from '../data'
 import { fetchMapServices } from '../api'
@@ -130,6 +131,7 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
         style={{ transform: `scale(${scale}) translate(${offset.x}px, ${offset.y}px)` }}
       >
         <img src={map} alt="Peta Kabupaten Lamongan" draggable={false} />
+        <CarAnimation />
         {markers.map((p) => {
           const matchQuery = !q || p.name.toLowerCase().includes(q)
           const matchStage = activeStageId === null || p.stage_id === activeStageId
