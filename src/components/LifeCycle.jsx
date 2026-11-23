@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import Icon, { Lines } from './Icon'
-import { STAGES, TOURISM } from '../data'
+import ServiceCards from './ServiceCards'
+import { STAGES, TOURISM, INDUSTRI, DINAS } from '../data'
 
 const Chevron = ({ d }) => (
   <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -8,7 +9,14 @@ const Chevron = ({ d }) => (
 
 const CATEGORIES = ['Siklus hidup warga', 'Pariwisata', 'Industri', 'Dinas']
 
-export default function LifeCycle({ cur, setCur }) {
+// Tabs that show a plain vertical list of cards (no lifecycle grouping)
+const LIST_PANELS = {
+  Pariwisata: TOURISM,
+  Industri: INDUSTRI,
+  Dinas: DINAS,
+}
+
+export default function LifeCycle({ cur, setCur, activeServiceId }) {
   const x0 = useRef(null)
   const catsRef = useRef(null)
   const scrollCats = (dir) => {
@@ -25,7 +33,7 @@ export default function LifeCycle({ cur, setCur }) {
     <section className="life debug2" aria-label="Siklus hidup warga" id="life">
       <div className="life-cats-wrap">
       <button type="button" className="life-cats-arrow l" aria-label="Kategori sebelumnya" onClick={() => scrollCats(-1)}><Chevron d="m15 5-7 7 7 7" /></button>
-      <div ref={catsRef} className="life-cats debug2" role="tablist" aria-label="Kategori" id="life-cats">
+      <div ref={catsRef} className="life-cats xdebug2" role="tablist" aria-label="Kategori" id="life-cats">
         {CATEGORIES.map((c) => (
           <button
             key={c}
@@ -59,7 +67,7 @@ export default function LifeCycle({ cur, setCur }) {
         </button>
       </div>
 
-      <div className="life-body debug2">
+      <div className="life-body xdebug2">
       <div
         className="rail"
         onPointerDown={(e) => (x0.current = e.clientX)}
@@ -85,19 +93,20 @@ export default function LifeCycle({ cur, setCur }) {
           </button>
         ))}
       </div>
-      <button className="arrow l" aria-label="Sebelumnya" disabled={curNum <= 0} onClick={() => go(curNum - 1)}><Chevron d="m15 5-7 7 7 7" /></button>
-      <button className="arrow r" aria-label="Berikutnya" disabled={curNum >= STAGES.length - 1} onClick={() => go(curNum + 1)}><Chevron d="m9 5 7 7-7 7" /></button>
+      <button className="arrow l " aria-label="Sebelumnya" disabled={curNum <= 0} onClick={() => go(curNum - 1)}><Chevron d="m15 5-7 7 7 7" /></button>
+      <button className="arrow r " aria-label="Berikutnya" disabled={curNum >= STAGES.length - 1} onClick={() => go(curNum + 1)}><Chevron d="m9 5 7 7-7 7" /></button>
       </div>
+      <ServiceCards stage={cur} activeServiceId={activeServiceId} />
       </div>
       )}
 
-      {cat === 'Pariwisata' && (
-      <div className="life-panel" role="tabpanel" id="life-panel-pariwisata" aria-label="Pariwisata">
+      {LIST_PANELS[cat] && (
+      <div className="life-panel debug2" role="tabpanel" id={`life-panel-${cat.toLowerCase()}`} aria-label={cat}>
         <div className="life-header-row">
-          <h2>PARIWISATA</h2>
+          <h2>{cat.toUpperCase()}</h2>
         </div>
         <div className="cards cards-vertical">
-          {TOURISM.map((item) => (
+          {LIST_PANELS[cat].map((item) => (
             <button
               className="card"
               key={item.id}

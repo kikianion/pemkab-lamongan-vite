@@ -1889,21 +1889,35 @@ button {
 }
 
 /* Debug overlay (VITE_DEBUG_UI=true): outline every element, hover shows tag#id.class */
-body.debug-ui *:not(.debug-overlay):not(.debug-overlay *) {
+/* No separate layer: DebugOverlay.jsx tags the real elements with
+   data-debug-label / data-debug-pseudo; outline and label are drawn on them.
+   outline and the pseudo label are out of flow, so no box ever changes size. */
+body.debug-ui [data-debug-label] {
    outline: 1px solid rgba(255, 0, 120, 0.35);
    outline-offset: -1px
 }
 .debug-overlay {
-   position: fixed;
-   inset: 0;
-   z-index: 2147483647;
    pointer-events: none
 }
-.debug-overlay__label {
-   position: fixed;
+body.debug-ui [data-debug-pseudo="before"]::before,
+body.debug-ui [data-debug-pseudo="after"]::after,
+body.debug-ui2 [data-debug-pseudo="before"]::before,
+body.debug-ui2 [data-debug-pseudo="after"]::after {
+   content: attr(data-debug-label);
+   /* absolute with no offsets = the element's own top-left (static position) */
+   position: absolute;
+   top: auto;
+   left: auto;
+   margin: 0;
+   align-self: flex-start;
+   justify-self: flex-start;
+   z-index: 2147483646;
    max-width: 260px;
    padding: 0 3px;
    font: 600 9px/1.3 ui-monospace, monospace;
+   letter-spacing: normal;
+   text-transform: none;
+   text-align: left;
    color: #fff;
    background: rgba(220, 0, 100, 0.85);
    border-radius: 0 0 3px 0;
@@ -1916,7 +1930,8 @@ body.debug-ui2 .debug2 {
    outline: 1px dashed rgba(255, 190, 0, 0.5);
    outline-offset: -2px
 }
-.debug-overlay__label--2 {
+body.debug-ui2 [data-debug-pseudo="before"]::before,
+body.debug-ui2 [data-debug-pseudo="after"]::after {
    font-size: 1.0rem;
    line-height: 1.2;
    max-width: 90vw;
@@ -1925,13 +1940,15 @@ body.debug-ui2 .debug2 {
    color: #1a1200;
    border-radius: 0 0 4px 0
 }
-.debug-overlay__box {
-   position: fixed;
-   background: rgba(0, 170, 255, 0.18);
-   outline: 2px solid #0af !important
+/* Hover highlight drawn on the hovered element itself (inset shadow: no layout impact) */
+body.debug-ui [data-debug-hover] {
+   outline: 2px solid #0af !important;
+   box-shadow: inset 0 0 0 9999px rgba(0, 170, 255, 0.18)
 }
 .debug-overlay__tip {
    position: fixed;
+   z-index: 2147483647;
+   pointer-events: none;
    max-width: 300px;
    padding: 2px 6px;
    font: 600 11px/1.4 ui-monospace, monospace;

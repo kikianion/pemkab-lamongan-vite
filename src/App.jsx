@@ -7,7 +7,6 @@ import MapSection from './components/MapSection'
 import LifeCycle from './components/LifeCycle'
 import DebugWidth from './components/DebugWidth'
 import DebugOverlay from './components/DebugOverlay'
-import ServiceCards from './components/ServiceCards'
 import ServicesTable from './components/ServicesTable'
 import TabBar from './components/TabBar'
 
@@ -118,13 +117,12 @@ export default function App() {
             onPin={handlePinClick}
             currentStage={stage}
           />
-          <LifeCycle cur={stage} setCur={setStage} />
-          <ServiceCards stage={stage} activeServiceId={hit.id} />
+          <LifeCycle cur={stage} setCur={setStage} activeServiceId={hit.id} />
         </>
       )}
 
       {/* Mobile bottom navigation */}
-      <div className="mobile-bottom-tabs">
+      <div className="mobile-bottom-tabs debug2">
         <TabBar active={tab} onChange={setTab} />
       </div>
 
