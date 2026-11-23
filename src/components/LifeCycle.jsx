@@ -22,10 +22,10 @@ export default function LifeCycle({ cur, setCur }) {
   const go = (k) => setCur(Math.max(0, Math.min(STAGES.length - 1, k)))
 
   return (
-    <section className="life xdebug2" aria-label="Siklus hidup warga" id="life">
+    <section className="life debug2" aria-label="Siklus hidup warga" id="life">
       <div className="life-cats-wrap">
       <button type="button" className="life-cats-arrow l" aria-label="Kategori sebelumnya" onClick={() => scrollCats(-1)}><Chevron d="m15 5-7 7 7 7" /></button>
-      <div ref={catsRef} className="life-cats xdebug2" role="tablist" aria-label="Kategori" id="life-cats">
+      <div ref={catsRef} className="life-cats debug2" role="tablist" aria-label="Kategori" id="life-cats">
         {CATEGORIES.map((c) => (
           <button
             key={c}
@@ -57,7 +57,7 @@ export default function LifeCycle({ cur, setCur }) {
         </button>
       </div>
 
-      <div className="life-body">
+      <div className="life-body debug2">
       <div
         className="rail"
         onPointerDown={(e) => (x0.current = e.clientX)}

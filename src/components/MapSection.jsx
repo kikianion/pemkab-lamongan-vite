@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import map from '../assets/map_island_3d.svg'
-import CarAnimation from './CarAnimation'
+import CarAnimation, { CAR_ANIMATION_ENABLED } from './CarAnimation'
 import Icon, { Lines } from './Icon'
 import { PINS as FALLBACK_PINS } from '../data'
 import { fetchMapServices } from '../api'
@@ -8,6 +8,16 @@ import { fetchMapServices } from '../api'
 const MIN_SCALE = 1
 const MAX_SCALE = 3
 const PAN_STEP = 40
+const CAR_PLAY_KEY = 'mapCarAnimation'
+
+// Delay (ms) after page load before the map intro animation starts. Set VITE_MAP_INTRO_DELAY in .env.local.
+const INTRO_DELAY_MS = Math.max(0, Number(import.meta.env.VITE_MAP_INTRO_DELAY ?? 2000) || 0)
+
+// Duration (ms) of the map intro animation (zoom + rotate + fade in). Set VITE_MAP_INTRO_DURATION in .env.local.
+const INTRO_DURATION_MS = Math.max(0, Number(import.meta.env.VITE_MAP_INTRO_DURATION ?? 2000) || 0)
+
+// Starting rotation angle (degrees) of the map intro animation. Set VITE_MAP_INTRO_ANGLE in .env.local.
+const INTRO_ANGLE_DEG = Number.isFinite(Number(import.meta.env.VITE_MAP_INTRO_ANGLE ?? -45)) ? Number(import.meta.env.VITE_MAP_INTRO_ANGLE ?? -45) : -45
 
 function JoystickButton({ area, label, disabled, onClick, children }) {
   return (
@@ -28,6 +38,14 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [markers, setMarkers] = useState([])
+  const [carPlaying, setCarPlaying] = useState(() => {
+    try { return localStorage.getItem(CAR_PLAY_KEY) !== 'paused' } catch { return true }
+  })
+  const toggleCar = () => setCarPlaying((p) => {
+    const next = !p
+    try { localStorage.setItem(CAR_PLAY_KEY, next ? 'playing' : 'paused') } catch { /* storage unavailable */ }
+    return next
+  })
 
   const [isDesktop, setIsDesktop] = useState(false)
   const drag = useRef(null)
@@ -84,7 +102,7 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
   const onPointerDown = (e) => {
     if (!canDrag) return
     // Never hijack clicks on buttons (pins, joystick, zoom)
-    if (e.target.closest('.pin, .map-zoom, .map-joystick')) return
+    if (e.target.closest('.pin, .map-zoom, .map-joystick, .map-car-toggle')) return
     drag.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -126,12 +144,13 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
       onPointerUp={onPointerUp}
       onPointerLeave={onPointerUp}
     >
+      <div className="map-intro" style={{ animationDelay: `${INTRO_DELAY_MS}ms`, animationDuration: `${INTRO_DURATION_MS}ms`, '--map-intro-angle': `${INTRO_ANGLE_DEG}deg` }}>
       <div
         className="map-canvas"
         style={{ transform: `scale(${scale}) translate(${offset.x}px, ${offset.y}px)` }}
       >
         <img src={map} alt="Peta Kabupaten Lamongan" draggable={false} />
-        <CarAnimation />
+        <CarAnimation playing={carPlaying} />
         {markers.map((p) => {
           const matchQuery = !q || p.name.toLowerCase().includes(q)
           const matchStage = activeStageId === null || p.stage_id === activeStageId
@@ -154,9 +173,24 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
           )
         })}
       </div>
+      </div>
       <div className="map-fade" aria-hidden="true" />
       <div className="map-fade-corner map-fade-corner-l" aria-hidden="true" />
       <div className="map-fade-corner map-fade-corner-r" aria-hidden="true" />
+      {CAR_ANIMATION_ENABLED && (
+        <button
+          className="map-car-toggle"
+          aria-label={carPlaying ? 'Jeda animasi mobil' : 'Putar animasi mobil'}
+          aria-pressed={carPlaying}
+          onClick={toggleCar}
+        >
+          {carPlaying ? (
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+          )}
+        </button>
+      )}
       <div className="map-joystick" aria-label="Geser peta">
         <JoystickButton area="up" label="Geser atas" disabled={panDisabled} onClick={() => panBy(0, PAN_STEP)}>&#9650;</JoystickButton>
         <JoystickButton area="left" label="Geser kiri" disabled={panDisabled} onClick={() => panBy(PAN_STEP, 0)}>&#9664;</JoystickButton>

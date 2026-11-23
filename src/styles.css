@@ -202,6 +202,21 @@ button {
    xbackground: #0a1236
 }
 
+/* Map: intro animation wrapper (zoom 80% -> 100%, rotate -45deg -> 0) on initial load */
+.map-intro {
+   position: absolute;
+   inset: 0;
+   transform-origin: center center;
+   animation: map-intro 1.4s cubic-bezier(.22, .8, .24, 1) both
+}
+@keyframes map-intro {
+   from { transform: scale(.8) rotate(var(--map-intro-angle, -45deg)); opacity: 0 }
+   to { transform: scale(1) rotate(0deg); opacity: 1 }
+}
+@media (prefers-reduced-motion: reduce) {
+   .map-intro { animation: none }
+}
+
 /* Map: transformable canvas (image + pins move together for zoom/pan) */
 .map-canvas {
    position: absolute;
@@ -271,6 +286,24 @@ button {
    background: #0d1536cc;
    border: 1px solid #5b6489;
    backdrop-filter: blur(4px)
+}
+
+/* Map: car animation play/pause toggle (top-right) */
+.map-car-toggle {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   z-index: 4;
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   display: grid;
+   place-items: center;
+   color: #dfe6ff;
+   background: #0d1536cc;
+   border: 1px solid #5b6489;
+   backdrop-filter: blur(4px);
+   cursor: pointer
 }
 
 /* Map: joystick pan control (bottom-left) - replaces drag panning */

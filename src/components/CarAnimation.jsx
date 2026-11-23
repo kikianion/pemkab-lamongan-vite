@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 // 3D-style car driving left -> right on the yellow road of map_island_3d_yellow_roads.svg
 // Overlay uses same viewBox as the map svg so coordinates match 1:1.
 const ROAD_PATH =
@@ -9,9 +11,26 @@ const DUR = '16s'
 const ANIMATE = !['false', '0', 'off'].includes(String(import.meta.env.VITE_CAR_ANIMATION ?? 'true').trim().toLowerCase())
 const START = 'translate(705,883) rotate(-1.4)'
 
-export default function CarAnimation() {
+export const CAR_ANIMATION_ENABLED = ANIMATE
+
+export default function CarAnimation({ playing = true }) {
+  const svgRef = useRef(null)
+
+  useEffect(() => {
+    const svg = svgRef.current
+    if (!ANIMATE || !svg?.pauseAnimations) return
+    if (playing) {
+      svg.unpauseAnimations()
+    } else {
+      // jump just past the fade-in so the car is visible while paused
+      svg.setCurrentTime?.(parseFloat(DUR) * 0.05)
+      svg.pauseAnimations()
+    }
+  }, [playing])
+
   return (
     <svg
+      ref={svgRef}
       className='map-car'
       viewBox='335 59 1795 1806'
       preserveAspectRatio='xMidYMid meet'
