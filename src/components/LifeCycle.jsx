@@ -17,8 +17,8 @@ export default function LifeCycle({ cur, setCur }) {
   const go = (k) => setCur(Math.max(0, Math.min(STAGES.length - 1, k)))
 
   return (
-    <section className="life" aria-label="Siklus hidup warga">
-      <div className="life-cats" role="tablist" aria-label="Kategori">
+    <section className="life xdebug2" aria-label="Siklus hidup warga" id="life">
+      <div className="life-cats debug2" role="tablist" aria-label="Kategori" id="life-cats">
         {CATEGORIES.map((c) => (
           <button
             key={c}
@@ -35,7 +35,7 @@ export default function LifeCycle({ cur, setCur }) {
           </button>
         ))}
       </div>
-      <div className="life-header-row">
+      <div className="life-header-row debug2" id="life-header-row">
         <h2>SIKLUS HIDUP WARGA</h2>
         <button
           type="button"
