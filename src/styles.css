@@ -2203,12 +2203,14 @@ button {
 
 .life .arrow {
    position: absolute;
-   top: calc(var(--lift) + var(--line-y));
+   top: var(--line-y);
    bottom: auto;
    transform: translateY(-50%);
    width: var(--arw);
    height: var(--arw);
    padding: 0;
+   margin: 0;
+   line-height: 0;
    display: grid;
    place-items: center;
    background: none;
@@ -2222,6 +2224,7 @@ button {
 .life .arrow svg {
    width: var(--arw);
    height: var(--arw);
+   display: block;
 }
 
 @media (min-width: 768px) {
