@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import map from '../assets/map_island_cropped.svg'
+import map from '../assets/map_island_3d.svg'
 import Icon, { Lines } from './Icon'
 import { PINS as FALLBACK_PINS } from '../data'
 import { fetchMapServices } from '../api'

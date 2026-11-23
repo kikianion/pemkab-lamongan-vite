@@ -37,7 +37,7 @@ export default function App() {
 
   return (
     <main
-      className={`app debug${isMapMode ? ' map-mode' : ''}${
+      className={`app xdebug${isMapMode ? ' map-mode' : ''}${
         isLayananMode ? ' layanan-mode' : ''
       }`}
     >
