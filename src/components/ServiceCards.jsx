@@ -49,11 +49,12 @@ export default function ServiceCards({ stage, activeServiceId }) {
       }))
 
   return (
-    <section id='servicecards' className="cards debug2">
-      {displayItems.map((item) => (
+    <section id='servicecards' key={String(stage)} className="cards debug2">
+      {displayItems.map((item, i) => (
         <button
           className={`card${activeServiceId === item.id ? ' active' : ''}`}
           key={item.id}
+          style={{ '--i': Math.min(i, 8) }}
           onClick={() => item.url && window.open(item.url, '_blank')}
         >
           <span className="tile"><Icon name={item.icon} /></span>

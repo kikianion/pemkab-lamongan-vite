@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Icon, { Lines } from './Icon'
 import ServiceCards from './ServiceCards'
 import { STAGES, TOURISM, INDUSTRI, DINAS } from '../data'
+import { fetchTourism } from '../api'
 
 const Chevron = ({ d }) => (
   <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
@@ -16,14 +17,40 @@ const LIST_PANELS = {
   Dinas: DINAS,
 }
 
-export default function LifeCycle({ cur, setCur, activeServiceId }) {
+export default function LifeCycle({ cur, setCur, activeServiceId, cat: catProp, setCat: setCatProp }) {
   const x0 = useRef(null)
   const catsRef = useRef(null)
   const scrollCats = (dir) => {
     const el = catsRef.current
     if (el) el.scrollBy({ left: dir * Math.max(120, el.clientWidth * 0.6), behavior: 'smooth' })
   }
-  const [cat, setCat] = useState(CATEGORIES[0])
+  // Active category can be controlled by parent (so the map can filter by it)
+  const [catLocal, setCatLocal] = useState(CATEGORIES[0])
+  const cat = catProp ?? catLocal
+  const setCat = setCatProp ?? setCatLocal
+  const [apiTourism, setApiTourism] = useState(null)
+
+  useEffect(() => {
+    let isMounted = true
+    fetchTourism().then((data) => {
+      if (!isMounted) return
+      setApiTourism(Array.isArray(data) && data.length > 0 ? data : null)
+    })
+    return () => { isMounted = false }
+  }, [])
+
+  // Pariwisata: API data when available, otherwise the local fallback list
+  const tourismItems = apiTourism
+    ? apiTourism.map((t) => ({
+        id: t.id,
+        icon: t.icon_url || t.icon_raw ? 'doc' : (t.icon || 'doc'),
+        iconUrl: t.icon_url || null,
+        iconRaw: t.icon_url ? null : (t.icon_raw || null),
+        title: t.title ?? t.nama ?? t.name ?? '',
+        url: t.url ?? null,
+      }))
+    : TOURISM
+  const listItems = cat === 'Pariwisata' ? tourismItems : LIST_PANELS[cat]
   const isAll = cur === 'all'
   const curNum = typeof cur === 'number' ? cur : -1
 
@@ -101,19 +128,19 @@ export default function LifeCycle({ cur, setCur, activeServiceId }) {
       )}
 
       {LIST_PANELS[cat] && (
-      <div className="life-panel debug2" role="tabpanel" id={`life-panel-${cat.toLowerCase()}`} aria-label={cat}>
+      <div className="life-panel debug2" role="tabpanel" key={cat} id={`life-panel-${cat.toLowerCase()}`} aria-label={cat}>
         <div className="life-header-row">
           <h2>{cat.toUpperCase()}</h2>
         </div>
         <div className="cards cards-vertical">
-          {LIST_PANELS[cat].map((item) => (
+          {listItems.map((item) => (
             <button
               className="card"
               key={item.id}
               type="button"
               onClick={() => item.url && window.open(item.url, '_blank')}
             >
-              <span className="tile"><Icon name={item.icon} /></span>
+              <span className="tile"><Icon name={item.icon} url={item.iconUrl} raw={item.iconRaw} /></span>
               <b>{item.title}</b>
             </button>
           ))}

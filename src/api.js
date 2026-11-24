@@ -36,3 +36,28 @@ export async function fetchServices(stageId = null) {
     return null
   }
 }
+
+export async function fetchPariwisataMap(query = '') {
+  try {
+    const url = query
+      ? `${API_BASE}/pariwisata/map?q=${encodeURIComponent(query)}`
+      : `${API_BASE}/pariwisata/map`
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    console.warn('Failed to load pariwisata map from API, falling back to local data', err)
+    return null
+  }
+}
+
+export async function fetchTourism() {
+  try {
+    const res = await fetch(`${API_BASE}/pariwisata`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    console.warn('Failed to load tourism from API, falling back to local data', err)
+    return null
+  }
+}

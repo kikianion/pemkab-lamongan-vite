@@ -306,6 +306,25 @@ button {
    cursor: pointer
 }
 
+/* Map: label show/hide toggle (top-right, below car toggle) */
+.map-label-toggle {
+   position: absolute;
+   top: 58px;
+   right: 10px;
+   z-index: 4;
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   display: grid;
+   place-items: center;
+   color: #dfe6ff;
+   background: #0d1536cc;
+   border: 1px solid #5b6489;
+   backdrop-filter: blur(4px);
+   cursor: pointer
+}
+.map.no-labels .pin:not(.pin-cluster) > span { display: none }
+
 /* Map: joystick pan control (bottom-left) - replaces drag panning */
 .map-joystick {
    position: absolute;
@@ -402,7 +421,10 @@ button {
    background: radial-gradient(#3b8b7c, #2a6a5f);
    border: 1.5px solid var(--tealRing);
    color: #dff3ee;
-   box-shadow: 0 0 14px #2fb59a55
+   box-shadow: 0 0 14px #2fb59a55;
+   outline: 3.5px solid #5ec8ff00;
+   outline-offset: 0;
+   transition: outline-color .2s ease, outline-offset .2s ease
 }
 
 /* Map: pin icon - purple tone variant */
@@ -417,6 +439,205 @@ button {
    background: radial-gradient(#4a8cd6, #2c5a9f);
    border-color: #7db3f0;
    box-shadow: 0 0 14px #4a8cd688
+}
+
+/* Map: pin icon - amber tone variant (pariwisata markers) */
+.pin[data-tone=amber] i {
+   background: radial-gradient(#f0b33a, #c2790f);
+   border-color: #ffd98a;
+   color: #fff7e0;
+   box-shadow: 0 0 14px #f0b33a88
+}
+
+/* Map: cluster bubble (count of merged pins), centered on its point */
+.pin-cluster {
+   transform: translate(-50%, -50%) scale(var(--pin-scale, 1));
+   transform-origin: 50% 50%;
+   z-index: 3;
+   cursor: pointer
+}
+.pin-cluster i {
+   width: 44px;
+   height: 44px;
+   font: 700 15px/1 Inter, sans-serif;
+   font-style: normal;
+   outline: 4px solid #ffffff22;
+   outline-offset: 0
+}
+
+/* Custom backend icons: <img> (animated SVG/GIF) and emoji fallback */
+.icon-img {
+   width: 100%;
+   height: 100%;
+   object-fit: contain;
+   display: block;
+   pointer-events: none
+}
+.pin i .icon-img { width: 22px; height: 22px }
+.card .tile .icon-img { width: 22px; height: 22px }
+.cluster-pop li i .icon-img { width: 16px; height: 16px }
+.icon-emoji {
+   font-size: 18px;
+   line-height: 1;
+   font-style: normal
+}
+.cluster-pop li i .icon-emoji { font-size: 13px }
+
+/* Map: animated pariwisata icon replaces circle frame + needle; label stays */
+.pin.pin-wisata.pin-animated i {
+   width: 48px;
+   height: 48px;
+   background: none;
+   border: 0;
+   box-shadow: none;
+   outline: 0
+}
+.pin.pin-wisata.pin-animated i .icon-img {
+   width: 100%;
+   height: 100%;
+   filter: drop-shadow(0 2px 3px #0009)
+}
+.pin.pin-wisata.pin-animated .needle {
+   display: none
+}
+.pin.pin-wisata.pin-animated.hit i .icon-img {
+   animation: needle-hit 1.2s ease-out 2
+}
+
+/* Inline animated SVG icons: sized like <img>, paused with the map play/pause toggle */
+.icon-inline {
+   display: block;
+   width: 100%;
+   height: 100%;
+   pointer-events: none
+}
+.icon-inline svg {
+   width: 100%;
+   height: 100%;
+   display: block
+}
+.map.anim-paused .icon-inline,
+.map.anim-paused .icon-inline * {
+   animation-play-state: paused !important
+}
+
+/* Map: cluster popup listing member pins */
+.cluster-pop {
+   position: absolute;
+   z-index: 6;
+   transform: translate(-50%, calc(-100% - 28px)) scale(var(--pin-scale, 1));
+   transform-origin: 50% 100%;
+   width: 210px;
+   padding: 8px;
+   border-radius: 12px;
+   background: #0d1536ee;
+   border: 1px solid #5b6489;
+   backdrop-filter: blur(4px);
+   color: #fff;
+   cursor: default
+}
+.cluster-pop-head {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: 0 4px 6px;
+   font: 700 13px/1 Inter, sans-serif
+}
+.cluster-pop-head button { color: #9aa4d6; font-size: 14px; padding: 2px 4px }
+.cluster-pop ul {
+   list-style: none;
+   margin: 0;
+   padding: 0;
+   max-height: 180px;
+   overflow-y: auto;
+   overscroll-behavior: contain;
+   scrollbar-width: thin;
+   scrollbar-color: #3a4a85 transparent
+}
+.cluster-pop li button {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   width: 100%;
+   padding: 6px;
+   border-radius: 8px;
+   text-align: left;
+   font: 600 12.5px/1.2 Inter, sans-serif
+}
+.cluster-pop li button:hover { background: #1c2342 }
+.cluster-pop li i {
+   flex: none;
+   width: 24px;
+   height: 24px;
+   border-radius: 50%;
+   display: grid;
+   place-items: center;
+   background: #244a4a
+}
+.cluster-pop li i svg { width: 14px; height: 14px }
+.cluster-pop-zoom {
+   width: 100%;
+   margin-top: 6px;
+   padding: 6px;
+   border-radius: 8px;
+   background: #1c2342;
+   border: 1px solid #2b3560;
+   font: 600 12px/1 Inter, sans-serif
+}
+
+/* Map: pariwisata needle pin. The needle TIP is the anchor (left/top = exact coordinate),
+   label hangs below the tip so it never shifts the anchor. */
+.pin.pin-wisata {
+   z-index: 2;
+   transform: translate(-50%, -100%) scale(var(--pin-scale, 1));
+   transform-origin: 50% 100%;
+   gap: 0;
+   padding: 0;
+   background: none;
+   border: 0;
+   cursor: pointer
+}
+.pin-wisata i {
+   position: relative;
+   z-index: 1
+}
+.pin-wisata .needle {
+   display: block;
+   width: 14px;
+   height: 12px;
+   margin-top: -4px;
+   overflow: visible;
+   filter: drop-shadow(0 2px 3px #0009)
+}
+.pin[data-tone=teal] .needle .body { fill: #2a6a5f }
+.pin[data-tone=purple] .needle .body { fill: #5f36a6 }
+.pin[data-tone=blue] .needle .body { fill: #2c5a9f }
+.pin-wisata .needle .body {
+   fill: #f0a81c;
+   stroke: #fff;
+   stroke-width: 1.6;
+   stroke-linejoin: round;
+   transition: stroke .2s ease, stroke-width .2s ease
+}
+.pin-wisata span {
+   position: absolute;
+   top: calc(100% + 3px);
+   left: 50%;
+   transform: translateX(-50%);
+   pointer-events: none
+}
+.pin-wisata.hit .needle {
+   animation: needle-hit 1.2s ease-out 2
+}
+@keyframes needle-hit {
+   0% { filter: drop-shadow(0 0 0 #fffc) }
+   100% { filter: drop-shadow(0 0 12px #fff0) }
+}
+@media (min-width: 768px) {
+   .pin-wisata .needle {
+      width: 16px;
+      height: 14px
+   }
 }
 
 /* Map: pin glyph size */
@@ -819,6 +1040,42 @@ button {
 /* Life panel wrapper: groups header row + body for the active category tab */
 .life .life-panel {
    display: block;
+   animation: life-panel-in .28s ease-out;
+}
+
+/* Service cards: re-enter with a short stagger whenever the lifecycle stage changes */
+#servicecards .card {
+   animation: card-in .3s ease-out backwards;
+   animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@keyframes card-in {
+   from {
+      opacity: 0;
+      transform: translateY(10px) scale(.97);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+   }
+}
+
+@keyframes life-panel-in {
+   from {
+      opacity: 0;
+      transform: translateY(8px);
+   }
+   to {
+      opacity: 1;
+      transform: translateY(0);
+   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+   .life .life-panel,
+   #servicecards .card {
+      animation: none;
+   }
 }
 
 /* Pariwisata panel: vertical list of cards, one per row */
@@ -827,6 +1084,41 @@ button {
    flex-direction: column;
    gap: 10px;
    padding: 14px 13px 0;
+}
+
+/* .life is pointer-events:none (it overlaps the map), so card lists must opt back in
+   or they can't be scrolled or clicked. Covers service cards and all list panels. */
+.life .cards {
+   pointer-events: auto;
+}
+
+/* Pariwisata list: fixed max height, cards scroll vertically inside the panel */
+#life-panel-pariwisata .cards.cards-vertical {
+   max-height: min(60vh, 620px);
+   overflow-y: auto;
+   overflow-x: hidden;
+   overscroll-behavior: contain;
+   -webkit-overflow-scrolling: touch;
+   padding-bottom: 14px;
+   scrollbar-width: thin;
+   scrollbar-color: #3a4a85 transparent;
+}
+
+#life-panel-pariwisata .cards.cards-vertical .card {
+   flex: none;
+}
+
+/* Lifecycle service cards: fixed max height, scrolls vertically like the Pariwisata list */
+#servicecards.cards {
+   max-height: min(55vh, 460px);
+   overflow-y: auto;
+   overflow-x: hidden;
+   overscroll-behavior: contain;
+   -webkit-overflow-scrolling: touch;
+   padding-bottom: 14px;
+   scrollbar-width: thin;
+   scrollbar-color: #3a4a85 transparent;
+   align-content: start;
 }
 
 .life .cards.cards-vertical .card {
@@ -1802,9 +2094,14 @@ button {
       background: radial-gradient(#3a8079, #245b5a)
    }
 
-   /* Hover: map pin lifts slightly (keep counter-scale for constant size) */
-   .pin:hover {
-      transform: translate(-50%, -20%) scale(var(--pin-scale, 1))
+   /* Hover: no zoom/shift, only a thin highlight border (anchor stays identical to resting state) */
+   .pin:hover i {
+      outline: 3.5px solid #5ec8ff;
+      outline-offset: 2px
+   }
+   .pin.pin-wisata:hover .needle .body {
+      stroke: #5ec8ff;
+      stroke-width: 3.6
    }
 
    /* Hover: tab item highlights */
@@ -1872,8 +2169,8 @@ button {
 .app.debug .card::before   { content: "ServiceCards / Card  .card" }
 .app.debug .tabs::before   { content: "TabBar  .tabs" }
 
-/* Debug: live viewport width readout, fixed bottom-left, extra-small */
-.app.debug .debug-width {
+/* Debug: live viewport width readout, absolute bottom-left, extra-small */
+.app .debug-width {
    position: fixed;
    left: 6px;
    bottom: 6px;

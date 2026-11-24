@@ -17,6 +17,8 @@ export default function App() {
   const [query, setQuery] = useState('')
   const [hit, setHit] = useState({ id: null, tick: 0 })
   const [tab, setTab] = useState('Beranda')
+  // Active life category button (Siklus hidup warga / Pariwisata / Industri / Dinas)
+  const [cat, setCat] = useState('Siklus hidup warga')
 
   // Map marker click: highlight only, do not change lifecycle stage
   const handlePinClick = (pin) => {
@@ -116,8 +118,9 @@ export default function App() {
             hit={hit}
             onPin={handlePinClick}
             currentStage={stage}
+            category={cat}
           />
-          <LifeCycle cur={stage} setCur={setStage} activeServiceId={hit.id} />
+          <LifeCycle cur={stage} setCur={setStage} activeServiceId={hit.id} cat={cat} setCat={setCat} />
         </>
       )}
 
@@ -127,7 +130,7 @@ export default function App() {
       </div>
 
       <img className="side-portrait right" src={portraitRight} alt="Wakil Bupati Lamongan" />
-      <DebugWidth />
+      {(import.meta.env.VITE_DEBUG_WIDTH === 'true' || import.meta.env.VITE_DEBUG_WIDTH === '1') && <DebugWidth />}
       {(import.meta.env.VITE_DEBUG_UI === 'true' || import.meta.env.VITE_DEBUG_UI === '1') && <DebugOverlay level={1} />}
       {import.meta.env.VITE_DEBUG_UI === '2' && <DebugOverlay level={2} />}
     </main>

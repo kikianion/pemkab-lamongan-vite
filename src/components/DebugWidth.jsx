@@ -9,5 +9,6 @@ export default function DebugWidth() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  return <div className="debug-width">{w}px</div>
+  const bp = w >= 1100 ? 'desktop' : w >= 768 ? 'tablet' : 'mobile'
+  return <div className="debug-width">{w}px {bp}</div>
 }

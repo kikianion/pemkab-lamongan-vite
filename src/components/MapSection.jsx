@@ -1,14 +1,42 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import map from '../assets/map_island_3d.svg'
 import CarAnimation, { CAR_ANIMATION_ENABLED } from './CarAnimation'
 import Icon, { Lines } from './Icon'
 import { PINS as FALLBACK_PINS } from '../data'
-import { fetchMapServices } from '../api'
+import { fetchMapServices, fetchPariwisataMap } from '../api'
+import { latLonToPct } from '../geo'
+import { clusterPins } from '../cluster'
 
 const MIN_SCALE = 1
 const MAX_SCALE = 3
 const PAN_STEP = 40
 const CAR_PLAY_KEY = 'mapCarAnimation'
+const NO_PINS = []
+
+// The SVG viewBox ratio. The <img> letterboxes the SVG (centered) inside the canvas, so pin
+// percentages from the backend (relative to the image itself) must be mapped onto the drawn area.
+const MAP_ASPECT = 1795 / 1806
+
+function fitToImage(x, y, w, h) {
+  if (!w || !h) return { left: x, top: y }
+  let cw = w
+  let ch = h
+  if (w / h > MAP_ASPECT) cw = h * MAP_ASPECT
+  else ch = w / MAP_ASPECT
+  const ox = (w - cw) / 2
+  const oy = (h - ch) / 2
+  return {
+    left: ((ox + (x / 100) * cw) / w) * 100,
+    top: ((oy + (y / 100) * ch) / h) * 100,
+  }
+}
+
+// Service marker position: prefer latitude/longitude (same as Pariwisata), fall back to left_pct/top_pct.
+function servicePos(s) {
+  const pos = latLonToPct(s.latitude, s.longitude)
+  if (pos) return { geo: true, left: pos.x, top: pos.y }
+  return { geo: false, left: parseFloat(s.left_pct), top: parseFloat(s.top_pct) }
+}
 
 // Delay (ms) after page load before the map intro animation starts. Set VITE_MAP_INTRO_DELAY in .env.local.
 const INTRO_DELAY_MS = Math.max(0, Number(import.meta.env.VITE_MAP_INTRO_DELAY ?? 2000) || 0)
@@ -33,11 +61,18 @@ function JoystickButton({ area, label, disabled, onClick, children }) {
   )
 }
 
-export default function MapSection({ query, hit, onPin, currentStage }) {
+export default function MapSection({ query, hit, onPin, currentStage, category = 'Siklus hidup warga' }) {
   const q = (query || '').toLowerCase()
+  // Filter pins by the active life category button
+  const showServices = category === 'Siklus hidup warga'
+  const showWisata = category === 'Pariwisata'
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [markers, setMarkers] = useState([])
+  const [wisata, setWisata] = useState([])
+  const [openCluster, setOpenCluster] = useState(null)
+  const canvasRef = useRef(null)
+  const [size, setSize] = useState({ w: 0, h: 0 })
   const [carPlaying, setCarPlaying] = useState(() => {
     try { return localStorage.getItem(CAR_PLAY_KEY) !== 'paused' } catch { return true }
   })
@@ -47,8 +82,21 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
     return next
   })
 
+  const [showLabels, setShowLabels] = useState(true)
   const [isDesktop, setIsDesktop] = useState(false)
   const drag = useRef(null)
+
+  // Track unscaled canvas size (px) so clustering can measure on-screen pin distance
+  useEffect(() => {
+    const el = canvasRef.current
+    if (!el) return undefined
+    const update = () => setSize({ w: el.clientWidth, h: el.clientHeight })
+    update()
+    if (typeof ResizeObserver === 'undefined') return undefined
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -62,8 +110,7 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
           icon: s.icon,
           name: s.title,
           label: Array.isArray(s.map_label) && s.map_label.length > 0 ? s.map_label : [s.title],
-          left: parseFloat(s.left_pct),
-          top: parseFloat(s.top_pct),
+          ...servicePos(s),
           url: s.url,
         }))
         setMarkers(formatted)
@@ -72,6 +119,38 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
       } else {
         setMarkers([])
       }
+    })
+    return () => { isMounted = false }
+  }, [query])
+
+  useEffect(() => {
+    let isMounted = true
+    fetchPariwisataMap(query).then((data) => {
+      if (!isMounted) return
+      if (!Array.isArray(data)) { setWisata([]); return }
+      const formatted = data
+        .map((w) => {
+          const pos = latLonToPct(w.latitude, w.longitude)
+          if (!pos) return null // skip rows without valid lat/lon
+          const name = w.nama || w.name || 'Pariwisata'
+          return {
+            id: `wisata-${w.id ?? name}`,
+            kind: 'wisata',
+            tone: 'amber',
+            icon: w.icon_url ? 'doc' : (w.icon_raw ? 'doc' : (w.icon || 'doc')),
+            iconUrl: w.icon_url || null,
+            iconRaw: w.icon_url ? null : (w.icon_raw || null),
+            animated: !!(w.icon_url && w.icon_is_animated),
+            name,
+            kategori: w.kategori,
+            kecamatan: w.kecamatan,
+            label: [name],
+            left: pos.x,
+            top: pos.y,
+          }
+        })
+        .filter(Boolean)
+      setWisata(formatted)
     })
     return () => { isMounted = false }
   }, [query])
@@ -98,11 +177,30 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
   }))
   const panDisabled = scale <= 1
 
+  // Cluster click: zoom in one level, centered on the cluster (offset kept inside map bounds)
+  const zoomToCluster = (c) => {
+    const ns = clamp(scale + 1)
+    const el = canvasRef.current
+    if (el) {
+      const w = el.clientWidth
+      const h = el.clientHeight
+      const maxX = (w - w / ns) / 2
+      const maxY = (h - h / ns) / 2
+      const ox = w / 2 - (c.left / 100) * w
+      const oy = h / 2 - (c.top / 100) * h
+      setOffset({
+        x: Math.round(Math.max(-maxX, Math.min(maxX, ox))),
+        y: Math.round(Math.max(-maxY, Math.min(maxY, oy))),
+      })
+    }
+    setScale(ns)
+  }
+
   const canDrag = isDesktop && scale > 1
   const onPointerDown = (e) => {
     if (!canDrag) return
     // Never hijack clicks on buttons (pins, joystick, zoom)
-    if (e.target.closest('.pin, .map-zoom, .map-joystick, .map-car-toggle')) return
+    if (e.target.closest('.pin, .map-zoom, .map-joystick, .map-car-toggle, .map-label-toggle')) return
     drag.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -135,9 +233,34 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
   // Target stage ID is 1-indexed (currentStage 0 -> stage_id 1)
   const activeStageId = typeof currentStage === 'number' ? currentStage + 1 : null
 
+  // Merge dense pins into clusters (only pins that are currently visible and not highlighted)
+  const wisataFitted = useMemo(
+    () => wisata.map((p) => ({ ...p, ...fitToImage(p.left, p.top, size.w, size.h) })),
+    [wisata, size],
+  )
+  const servicesFitted = useMemo(
+    () => markers.map((p) => (p.geo ? { ...p, ...fitToImage(p.left, p.top, size.w, size.h) } : p)),
+    [markers, size],
+  )
+  const activePins = showServices ? servicesFitted : showWisata ? wisataFitted : NO_PINS
+  const { singles, clusters } = useMemo(() => {
+    const visible = (p) => {
+      const matchQuery = !q || p.name.toLowerCase().includes(q)
+      if (p.kind === 'wisata') return matchQuery
+      return matchQuery && (activeStageId === null || p.stage_id === activeStageId)
+    }
+    return clusterPins(activePins, {
+      width: size.w,
+      height: size.h,
+      scale,
+      maxScale: MAX_SCALE,
+      canCluster: (p) => visible(p) && p.id !== hit.id,
+    })
+  }, [activePins, size, scale, q, activeStageId, hit.id])
+
   return (
     <section
-      className={`map${canDrag ? ' draggable' : ''}`}
+      className={`map${canDrag ? ' draggable' : ''}${carPlaying ? '' : ' anim-paused'}${showLabels ? '' : ' no-labels'}`}
       aria-label="Peta layanan"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
@@ -146,12 +269,13 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
     >
       <div className="map-intro" style={{ animationDelay: `${INTRO_DELAY_MS}ms`, animationDuration: `${INTRO_DURATION_MS}ms`, '--map-intro-angle': `${INTRO_ANGLE_DEG}deg` }}>
       <div
+        ref={canvasRef}
         className="map-canvas"
         style={{ transform: `scale(${scale}) translate(${offset.x}px, ${offset.y}px)` }}
       >
         <img src={map} alt="Peta Kabupaten Lamongan" draggable={false} />
         <CarAnimation playing={carPlaying} />
-        {markers.map((p) => {
+        {showServices && singles.map((p) => {
           const matchQuery = !q || p.name.toLowerCase().includes(q)
           const matchStage = activeStageId === null || p.stage_id === activeStageId
           const isVisible = matchQuery && matchStage
@@ -159,7 +283,7 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
           return (
             <button
               key={`${p.id}-${hit.id === p.id ? hit.tick : 0}`}
-              className={`pin${!isVisible ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
+              className={`pin pin-wisata${!isVisible ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
               data-tone={p.tone}
               style={{ left: `${p.left}%`, top: `${p.top}%`, '--pin-scale': 1 / scale }}
               onClick={(e) => {
@@ -167,11 +291,80 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
                 onPin(p)
               }}
             >
-              <i><Icon name={p.icon} /></i>
+              <i><Icon name={p.icon} url={p.iconUrl} raw={p.iconRaw} animated={p.animated} paused={!carPlaying} /></i>
+              <svg className="needle" aria-hidden="true" viewBox="0 0 14 12">
+                <path className="body" d="M1 0H13L7 11.5z" />
+              </svg>
               <span><Lines lines={p.label} /></span>
             </button>
           )
         })}
+        {showWisata && singles.map((p) => {
+          const isVisible = !q || p.name.toLowerCase().includes(q)
+          return (
+            <button
+              key={`${p.id}-${hit.id === p.id ? hit.tick : 0}`}
+              className={`pin pin-wisata${p.animated ? ' pin-animated' : ''}${!isVisible ? ' hide' : ''}${hit.id === p.id ? ' hit' : ''}`}
+              data-tone={p.tone}
+              title={[p.name, p.kategori, p.kecamatan].filter(Boolean).join(' - ')}
+              style={{ left: `${p.left}%`, top: `${p.top}%`, '--pin-scale': 1 / scale }}
+              onClick={(e) => {
+                e.stopPropagation()
+                onPin(p)
+              }}
+            >
+              <i><Icon name={p.icon} url={p.iconUrl} raw={p.iconRaw} animated={p.animated} paused={!carPlaying} /></i>
+              <svg className="needle" aria-hidden="true" viewBox="0 0 14 12">
+                <path className="body" d="M1 0H13L7 11.5z" />
+              </svg>
+              <span><Lines lines={p.label} /></span>
+            </button>
+          )
+        })}
+        {clusters.map((c) => (
+          <button
+            key={c.id}
+            className="pin pin-cluster"
+            data-tone={c.tone}
+            aria-label={`${c.count} lokasi, perbesar peta`}
+            title={`${c.count} lokasi`}
+            style={{ left: `${c.left}%`, top: `${c.top}%`, '--pin-scale': 1 / scale }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setOpenCluster((id) => (id === c.id ? null : c.id))
+            }}
+          >
+            <i>{c.count}</i>
+          </button>
+        ))}
+        {(() => {
+          const opened = clusters.find((c) => c.id === openCluster)
+          if (!opened) return null
+          return (
+            <div
+              className="cluster-pop"
+              style={{ left: `${opened.left}%`, top: `${opened.top}%`, '--pin-scale': 1 / scale }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="cluster-pop-head">
+                <b>{opened.count} lokasi</b>
+                <button type="button" aria-label="Tutup" onClick={() => setOpenCluster(null)}>&#10005;</button>
+              </div>
+              <ul>
+                {opened.members.map((m) => (
+                  <li key={m.id}>
+                    <button type="button" onClick={() => { onPin(m); setOpenCluster(null) }}>
+                      <i><Icon name={m.icon} url={m.iconUrl} raw={m.iconRaw} /></i>
+                      <span>{m.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" className="cluster-pop-zoom" onClick={() => { setOpenCluster(null); zoomToCluster(opened) }}>Perbesar peta</button>
+            </div>
+          )
+        })()}
       </div>
       </div>
       <div className="map-fade" aria-hidden="true" />
@@ -191,6 +384,18 @@ export default function MapSection({ query, hit, onPin, currentStage }) {
           )}
         </button>
       )}
+      <button
+        className="map-label-toggle"
+        aria-label={showLabels ? 'Sembunyikan label' : 'Tampilkan label'}
+        aria-pressed={showLabels}
+        title={showLabels ? 'Sembunyikan label' : 'Tampilkan label'}
+        onClick={() => setShowLabels((v) => !v)}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 7V4h16v3M9 20h6M12 4v16" />
+          {!showLabels && <path d="M3 3l18 18" />}
+        </svg>
+      </button>
       <div className="map-joystick" aria-label="Geser peta">
         <JoystickButton area="up" label="Geser atas" disabled={panDisabled} onClick={() => panBy(0, PAN_STEP)}>&#9650;</JoystickButton>
         <JoystickButton area="left" label="Geser kiri" disabled={panDisabled} onClick={() => panBy(PAN_STEP, 0)}>&#9664;</JoystickButton>
