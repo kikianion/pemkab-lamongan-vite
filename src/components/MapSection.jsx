@@ -3,7 +3,7 @@ import map from '../assets/map_island_3d.svg'
 import CarAnimation, { CAR_ANIMATION_ENABLED } from './CarAnimation'
 import Icon, { Lines } from './Icon'
 import { PINS as FALLBACK_PINS } from '../data'
-import { fetchMapServices, fetchPariwisataMap } from '../api'
+import { fetchMapServices, fetchPariwisataMap, fetchIndustriMap, fetchDinasMap } from '../api'
 import { latLonToPct } from '../geo'
 import { clusterPins } from '../cluster'
 
@@ -66,10 +66,13 @@ export default function MapSection({ query, hit, onPin, currentStage, category =
   // Filter pins by the active life category button
   const showServices = category === 'Siklus hidup warga'
   const showWisata = category === 'Pariwisata'
+  const showIndustri = category === 'Industri'
+  const showDinas = category === 'Dinas'
   const [scale, setScale] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const [markers, setMarkers] = useState([])
   const [wisata, setWisata] = useState([])
+  const [other, setOther] = useState([]) // Industri / Dinas markers (active category only)
   const [openCluster, setOpenCluster] = useState(null)
   const canvasRef = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
@@ -154,6 +157,44 @@ export default function MapSection({ query, hit, onPin, currentStage, category =
     })
     return () => { isMounted = false }
   }, [query])
+
+  // Industri / Dinas markers from /api/industri/map and /api/dinas/map
+  useEffect(() => {
+    const fetcher = category === 'Industri' ? fetchIndustriMap : category === 'Dinas' ? fetchDinasMap : null
+    if (!fetcher) { setOther([]); return undefined }
+    let isMounted = true
+    setOther([])
+    fetcher(query).then((data) => {
+      if (!isMounted) return
+      if (!Array.isArray(data)) { setOther([]); return }
+      const tone = category === 'Industri' ? 'blue' : 'purple'
+      const formatted = data
+        .map((r) => {
+          const pos = latLonToPct(r.latitude, r.longitude)
+          if (!pos) return null // skip rows without valid lat/lon
+          const name = r.nama || r.name || r.title || category
+          return {
+            id: `${category}-${r.id ?? name}`,
+            kind: 'wisata', // same rule as pariwisata: filter by query only, no lifecycle stage
+            tone,
+            icon: r.icon_url ? 'doc' : (r.icon_raw ? 'doc' : (r.icon || 'work')),
+            iconUrl: r.icon_url || null,
+            iconRaw: r.icon_url ? null : (r.icon_raw || null),
+            animated: !!(r.icon_url && r.icon_is_animated),
+            name,
+            kategori: r.kategori,
+            kecamatan: r.kecamatan,
+            url: r.url,
+            label: [name],
+            left: pos.x,
+            top: pos.y,
+          }
+        })
+        .filter(Boolean)
+      setOther(formatted)
+    })
+    return () => { isMounted = false }
+  }, [query, category])
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width:768px)')
@@ -242,7 +283,11 @@ export default function MapSection({ query, hit, onPin, currentStage, category =
     () => markers.map((p) => (p.geo ? { ...p, ...fitToImage(p.left, p.top, size.w, size.h) } : p)),
     [markers, size],
   )
-  const activePins = showServices ? servicesFitted : showWisata ? wisataFitted : NO_PINS
+  const otherFitted = useMemo(
+    () => other.map((p) => ({ ...p, ...fitToImage(p.left, p.top, size.w, size.h) })),
+    [other, size],
+  )
+  const activePins = showServices ? servicesFitted : showWisata ? wisataFitted : (showIndustri || showDinas) ? otherFitted : NO_PINS
   const { singles, clusters } = useMemo(() => {
     const visible = (p) => {
       const matchQuery = !q || p.name.toLowerCase().includes(q)
@@ -299,7 +344,7 @@ export default function MapSection({ query, hit, onPin, currentStage, category =
             </button>
           )
         })}
-        {showWisata && singles.map((p) => {
+        {(showWisata || showIndustri || showDinas) && singles.map((p) => {
           const isVisible = !q || p.name.toLowerCase().includes(q)
           return (
             <button

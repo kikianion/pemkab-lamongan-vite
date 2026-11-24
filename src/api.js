@@ -51,6 +51,21 @@ export async function fetchPariwisataMap(query = '') {
   }
 }
 
+async function fetchMapList(path, query, label) {
+  try {
+    const url = query ? `${API_BASE}/${path}?q=${encodeURIComponent(query)}` : `${API_BASE}/${path}`
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return await res.json()
+  } catch (err) {
+    console.warn(`Failed to load ${label} map from API`, err)
+    return null
+  }
+}
+
+export const fetchIndustriMap = (query = '') => fetchMapList('industri/map', query, 'industri')
+export const fetchDinasMap = (query = '') => fetchMapList('dinas/map', query, 'dinas')
+
 export async function fetchTourism() {
   try {
     const res = await fetch(`${API_BASE}/pariwisata`)

@@ -1,43 +1,40 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-const svgCache = new Map()
+const blobCache = new Map()
 
-// Inline SVG so CSS (animation-play-state) can pause it. Falls back to <img> on fetch failure.
+// Static (no animation) blob URL of an SVG: strips SMIL + <script>, injects CSS animation:none.
+function blobSrc(url, freeze) {
+  const key = `${freeze ? 'f' : 'p'}|${url}`
+  if (blobCache.has(key)) return Promise.resolve(blobCache.get(key))
+  return fetch(url)
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.text() })
+    .then((t) => {
+      const clean = t.replace(/<script[\s\S]*?<\/script>/gi, '')
+      const frozenTxt = !freeze ? clean : clean
+        .replace(/<(animate|animateTransform|animateMotion|set)\b[\s\S]*?(\/>|<\/\1>)/gi, '')
+        .replace(/<svg([^>]*)>/i, '<svg$1><style>*{animation:none!important;transition:none!important}</style>')
+      const blob = URL.createObjectURL(new Blob([frozenTxt], { type: 'image/svg+xml' }))
+      blobCache.set(key, blob)
+      return blob
+    })
+}
+
+// <img> keeps animation when playing; swaps to frozen blob URL when paused.
 function InlineSvg({ url, paused }) {
-  const boxRef = useRef(null)
-  const [markup, setMarkup] = useState(() => svgCache.get(url) ?? null)
-  const [failed, setFailed] = useState(false)
+  const [src, setSrc] = useState(url)
   useEffect(() => {
-    if (svgCache.has(url)) { setMarkup(svgCache.get(url)); return undefined }
     let alive = true
-    fetch(url)
-      .then((r) => { if (!r.ok) throw new Error(r.status); return r.text() })
-      .then((t) => {
-        const clean = t.replace(/<script[\s\S]*?<\/script>/gi, '')
-        svgCache.set(url, clean)
-        if (alive) setMarkup(clean)
-      })
-      .catch(() => { if (alive) setFailed(true) })
+    blobSrc(url, paused)
+      .then((b) => { if (alive) setSrc(b) })
+      .catch((e) => { console.warn('icon blob fetch failed (CORS?)', url, e); if (alive) setSrc(url) })
     return () => { alive = false }
-  }, [url])
-  // SMIL (<animate>) and CSS animations: pause both
-  useEffect(() => {
-    const svg = boxRef.current?.querySelector('svg')
-    if (!svg) return
-    svg.style.setProperty('animation-play-state', paused ? 'paused' : 'running')
-    svg.querySelectorAll('*').forEach((el) => el.style.setProperty('animation-play-state', paused ? 'paused' : 'running'))
-    if (paused) svg.pauseAnimations?.()
-    else svg.unpauseAnimations?.()
-  }, [paused, markup])
-  if (failed || !markup) {
-    return failed ? <img className="icon-img" src={url} alt="" aria-hidden="true" draggable={false} /> : null
-  }
-  return <span ref={boxRef} className="icon-inline" aria-hidden="true" dangerouslySetInnerHTML={{ __html: markup }} />
+  }, [url, paused])
+  return <img className="icon-img" src={src} alt="" aria-hidden="true" draggable={false} />
 }
 
 export default function Icon({ name, url, raw, animated, paused }) {
   // Custom icon from backend: <img> so animated SVG/GIF plays (<use> would freeze it)
-  if (url && animated && /\.svg(\?|$)/i.test(url)) return <InlineSvg url={url} paused={paused} />
+  if (url && /\.svg(\?|$)/i.test(url)) return <InlineSvg url={url} paused={paused} />
   if (url) return <img className="icon-img" src={url} alt="" aria-hidden="true" draggable={false} />
   // Emoji / plain text fallback
   if (raw) return <span className="icon-emoji" aria-hidden="true">{raw}</span>
