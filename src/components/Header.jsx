@@ -2,11 +2,32 @@ import { useEffect, useRef, useState } from 'react'
 import left from '../assets/portrait-left.jpg'
 import right from '../assets/portrait-right.jpg'
 import frontLogo from '../assets/front-logo.gif'
+import { fetchWebSettings } from '../api'
+
+const DEFAULT_TITLE = 'PEMKAB LAMONGAN'
 
 export default function Header({ children, navSlot }) {
   const [collapsed, setCollapsed] = useState(false)
   const topRef = useRef(null)
   const initialMapTop = useRef(0)
+  const [settings, setSettings] = useState(null)
+
+  // Portal title + leader avatars from /api/web-settings; local values stay as fallback
+  useEffect(() => {
+    let alive = true
+    fetchWebSettings().then((s) => { if (alive && s) setSettings(s) })
+    return () => { alive = false }
+  }, [])
+
+  const title = settings?.app_title || settings?.site_title || DEFAULT_TITLE
+  const bupatiSrc = settings?.bupati_avatar || settings?.bupati?.foto_url || left
+  const wakilSrc = settings?.wakil_avatar || settings?.wakil_bupati?.foto_url || right
+  const bupatiAlt = settings?.bupati_name ? `Bupati: ${settings.bupati_name}` : 'Bupati Lamongan'
+  const wakilAlt = settings?.wakil_bupati_name ? `Wakil Bupati: ${settings.wakil_bupati_name}` : 'Wakil Bupati Lamongan'
+  // If a backend avatar URL fails to load, fall back to the bundled portrait
+  const onAvatarError = (fallback) => (e) => {
+    if (e.currentTarget.src !== fallback) e.currentTarget.src = fallback
+  }
 
   useEffect(() => {
     const mapEl = () => document.querySelector('.map')
@@ -41,7 +62,7 @@ export default function Header({ children, navSlot }) {
       </div>
 
       <div className="brand">
-        <img className="avatar" src={left} alt="Bupati Lamongan" />
+        <img className="avatar" src={bupatiSrc} alt={bupatiAlt} onError={onAvatarError(left)} />
         <div className="brand-logo-wrap">
           <img
             className="brand-logo-desktop"
@@ -49,8 +70,8 @@ export default function Header({ children, navSlot }) {
             alt="Logo Pemkab Lamongan"
           />
         </div>
-        <h1>PEMKAB LAMONGAN</h1>
-        <img className="avatar" src={right} alt="Wakil Bupati Lamongan" />
+        <h1>{title}</h1>
+        <img className="avatar" src={wakilSrc} alt={wakilAlt} onError={onAvatarError(right)} />
       </div>
 
       {/* Target anchor slot for the desktop navigation buttons */}
