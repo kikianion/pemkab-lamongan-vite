@@ -20,6 +20,10 @@ export default function Header({ children, navSlot }) {
   }, [])
 
   const title = settings?.app_title || settings?.site_title || DEFAULT_TITLE
+  // Split the portal title into two lines: primary (first words) + smaller secondary (last two words)
+  const titleWords = String(title).trim().split(/\s+/)
+  const titleSub = titleWords.length > 2 ? titleWords.slice(-2).join(' ') : ''
+  const titleMain = titleWords.length > 2 ? titleWords.slice(0, -2).join(' ') : title
   const bupatiSrc = settings?.bupati_avatar || settings?.bupati?.foto_url || left
   const wakilSrc = settings?.wakil_avatar || settings?.wakil_bupati?.foto_url || right
   const bupatiAlt = settings?.bupati_name ? `Bupati: ${settings.bupati_name}` : 'Bupati Lamongan'
@@ -37,11 +41,18 @@ export default function Header({ children, navSlot }) {
       if (m) initialMapTop.current = m.getBoundingClientRect().top + window.scrollY
     }
     const onScroll = () => {
-      if (window.innerWidth >= 1100) { setCollapsed(false); return }
+      if (window.innerWidth >= 1100) {
+        setCollapsed(false)
+        document.body.removeAttribute('data-search-collapsed')
+        return
+      }
       const m = mapEl()
       if (!m) return
       const mapViewportTop = m.getBoundingClientRect().top
-      setCollapsed(mapViewportTop <= initialMapTop.current / 2)
+      const next = mapViewportTop <= initialMapTop.current / 2
+      setCollapsed(next)
+      if (next) document.body.setAttribute('data-search-collapsed', '')
+      else document.body.removeAttribute('data-search-collapsed')
     }
     const onResize = () => { measure(); onScroll() }
     measure()
@@ -55,7 +66,7 @@ export default function Header({ children, navSlot }) {
   }, [])
 
   return (
-    <header className="top" ref={topRef}>
+    <header className="top debug2" ref={topRef}>
       {/* Header Search Slot */}
       <div className={`header-search-slot${collapsed ? ' collapsed' : ''}`}>
         {children}
@@ -70,7 +81,10 @@ export default function Header({ children, navSlot }) {
             alt="Logo Pemkab Lamongan"
           />
         </div>
-        <h1>{title}</h1>
+        <h1>
+          <span className="brand-title-main">{titleMain}</span>
+          {titleSub && <span className="brand-title-sub">{titleSub}</span>}
+        </h1>
         <img className="avatar" src={wakilSrc} alt={wakilAlt} onError={onAvatarError(right)} />
       </div>
 
